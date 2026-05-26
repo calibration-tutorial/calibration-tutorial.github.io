@@ -370,42 +370,42 @@
             <li class="paper">
               <p class="paper-title"><a href="https://www.tandfonline.com/doi/abs/10.1080/01621459.1982.10477856">The Well-Calibrated Bayesian</a></p>
               <p class="paper-meta"><strong>Authors:</strong> A. P. Dawid. <strong>Publication:</strong> Journal of the American Statistical Association, 1982.</p>
-              <p class="paper-note">Introduces calibration as a formal standard for probability forecasts, establishing the idea that predicted probabilities should match empirical frequencies.</p>
+              <p class="paper-note">Formalizes calibration for sequential probability forecasts and proves that a coherent Bayesian expects their forecasts to be well calibrated.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://www.sciencedirect.com/science/article/pii/S0899825697905959">Calibrated Learning and Correlated Equilibrium</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Dean Foster, Rakesh Vohra. <strong>Publication:</strong> Games and Economic Behavior, 1997.</p>
-              <p class="paper-note">Shows that calibrated forecasting can be achieved in repeated games and connects calibrated learning to correlated equilibrium.</p>
+              <p class="paper-note">Shows that players who best respond to calibrated forecasts generate play whose limit points are correlated equilibria.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://deanfoster.net/research/calibration.pdf">Asymptotic Calibration</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Dean Foster, Rakesh Vohra. <strong>Publication:</strong> Biometrika, 1998.</p>
-              <p class="paper-note">Provides foundational asymptotic results for constructing forecasts whose long-run empirical frequencies match stated probabilities.</p>
+              <p class="paper-note">Shows that randomized forecasting can guarantee asymptotic calibration against arbitrary outcome sequences, while deterministic forecasting cannot.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://homes.cs.washington.edu/~sham/papers/gt/calibration.pdf">Deterministic Calibration and Nash Equilibrium</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Sham Kakade, Dean Foster. <strong>Publication:</strong> COLT 2004; Journal of Computer and System Sciences, 2008.</p>
-              <p class="paper-note">Gives deterministic calibration algorithms and clarifies the link between calibrated prediction and Nash equilibrium.</p>
+              <p class="paper-note">Introduces deterministic weak calibration and uses it to define learning dynamics whose empirical play converges to convex combinations of Nash equilibria.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2210.07152">Smooth Calibration, Leaky Forecasts, Finite Recall, and Nash Dynamics</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Dean Foster, Sergiu Hart. <strong>Publication:</strong> Games and Economic Behavior, 2018.</p>
-              <p class="paper-note">Develops smooth variants of calibration and relates leaky forecasts and finite-memory forecasting dynamics to game-theoretic learning.</p>
+              <p class="paper-note">Introduces smooth calibration, showing it can be achieved deterministically with leaked finite-memory forecasts and yields approximate Nash play in repeated games.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://proceedings.mlr.press/v80/hebert-johnson18a.html">Multicalibration: Calibration for the Computationally-Identifiable Masses</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Ursula Hebert-Johnson, Michael Kim, Omer Reingold, Guy Rothblum. <strong>Publication:</strong> ICML 2018.</p>
-              <p class="paper-note">Introduces multicalibration, requiring calibration simultaneously on rich families of computationally identifiable subgroups.</p>
+              <p class="paper-note">Introduces multicalibration, gives algorithms for learning multicalibrated predictors, and connects the task to agnostic learning.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/1805.12317">Multiaccuracy: Black-Box Post-Processing for Fairness in Classification</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Michael P. Kim, Amirata Ghorbani, James Zou. <strong>Publication:</strong> AIES 2019.</p>
-              <p class="paper-note">Introduces multiaccuracy as a weaker, black-box post-processing guarantee that removes systematic subgroup prediction bias.</p>
+              <p class="paper-note">Introduces multiaccuracy auditing and black-box post-processing for removing systematic prediction bias on identifiable subgroups.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2504.15206">How Global Calibration Strengthens Multiaccuracy</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Silvia Casacuberta, Parikshit Gopalan, Varun Kanade, Omer Reingold. <strong>Publication:</strong> arXiv, 2025.</p>
-              <p class="paper-note">Shows that combining global calibration with multiaccuracy substantially strengthens multiaccuracy and recovers several implications of multicalibration.</p>
+              <p class="paper-note">Clarifies the hierarchy between multiaccuracy, calibrated multiaccuracy, and multicalibration by showing that global calibration makes multiaccuracy much more powerful.</p>
             </li>
           </ul>
         </section>
@@ -426,7 +426,7 @@
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/1709.02012">On Fairness and Calibration</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Geoff Pleiss, Manish Raghavan, Felix Wu, Jon Kleinberg, Kilian Q. Weinberger. <strong>Publication:</strong> NeurIPS 2017.</p>
-              <p class="paper-note">Studies calibration in group-fair prediction and shows how post-processing can improve fairness notions while preserving calibrated probabilities.</p>
+              <p class="paper-note">Shows that calibrated probability estimates are compatible with only limited error-rate parity constraints, highlighting a sharp tension between calibration and error-disparity goals.</p>
             </li>
           </ul>
         </section>
@@ -437,7 +437,7 @@
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2005.01757">Sample Complexity of Uniform Convergence for Multicalibration</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Eliran Shabat, Lee Cohen, Yishay Mansour. <strong>Publication:</strong> NeurIPS 2020.</p>
-              <p class="paper-note">Gives baseline uniform-convergence sample-complexity bounds for estimating and controlling multicalibration error.</p>
+              <p class="paper-note">Gives uniform-convergence sample-complexity bounds that control population multicalibration error from empirical multicalibration error independently of prediction error.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2008.08037">Moment Multicalibration for Uncertainty Estimation</a></p>
@@ -447,37 +447,37 @@
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2108.03837">Online Minimax Multiobjective Optimization: Multicalibeating and Other Applications</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Daniel D. Lee, Georgy Noarov, Mallesh Pai, Aaron Roth. <strong>Publication:</strong> NeurIPS 2022.</p>
-              <p class="paper-note">Develops an online multiobjective optimization framework that yields multicalibration-style guarantees and the multicalibeating application.</p>
+              <p class="paper-note">Develops a vector-valued online optimization framework that recovers multicalibration guarantees and enables multicalibeating against collections of forecasters.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2103.05853">Multicalibrated Partitions for Importance Weights</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Parikshit Gopalan, Omer Reingold, Vatsal Sharan, Udi Wieder. <strong>Publication:</strong> ALT 2022.</p>
-              <p class="paper-note">Uses multicalibration to construct partitions that support accurate importance weighting across subpopulations.</p>
+              <p class="paper-note">Introduces multicalibrated partitions to compute importance weights from samples with set-wise sandwiching guarantees.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2203.01255">Low-Degree Multicalibration</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Parikshit Gopalan, Michael Kim, Mihir Singhal, Shengjia Zhao. <strong>Publication:</strong> arXiv, 2022.</p>
-              <p class="paper-note">Studies the power and limits of multicalibration when the auditing class is restricted to low-degree functions.</p>
+              <p class="paper-note">Defines low-degree multicalibration as an efficient hierarchy between multiaccuracy and full multicalibration that retains key fairness and accuracy guarantees.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2209.07312">Multicalibrated Regression for Downstream Fairness</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Ira Globus-Harris, Varun Gupta, Christopher Jung, Michael Kearns, Jamie Morgenstern, Aaron Roth. <strong>Publication:</strong> AIES 2023; arXiv.</p>
-              <p class="paper-note">Extends multicalibration to regression settings and analyzes how these guarantees transfer to downstream fairness objectives.</p>
+              <p class="paper-note">Shows how a multicalibrated regression function can be post-processed without labeled data to solve many downstream fairness-constrained classification tasks.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://proceedings.mlr.press/v202/noarov23a.html">The Statistical Scope of Multicalibration</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Georgy Noarov, Aaron Roth. <strong>Publication:</strong> ICML 2023.</p>
-              <p class="paper-note">Characterizes the statistical properties implied by multicalibration through the lens of property elicitation.</p>
+              <p class="paper-note">Characterizes which continuous scalar distributional properties can be multicalibrated by showing that multicalibration is possible exactly for elicitable properties.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2302.10863">A Unifying Perspective on Multi-Calibration: Game Dynamics for Multi-Objective Learning</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Nika Haghtalab, Michael I. Jordan, Eric Zhao. <strong>Publication:</strong> NeurIPS 2023.</p>
-              <p class="paper-note">Frames multicalibration and related constraints as multi-objective game dynamics, yielding a unified algorithmic view.</p>
+              <p class="paper-note">Places multicalibration in a multi-objective learning framework and uses game dynamics to simplify analyses and improve guarantees for several variants.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://proceedings.mlr.press/v267/ghuge25a.html">Improved and Oracle-Efficient Online L1-Multicalibration</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Rohan Ghuge, Vidya Muthukumar, Sahil Singla. <strong>Publication:</strong> ICML 2025.</p>
-              <p class="paper-note">Improves online L1-multicalibration rates and gives oracle-efficient algorithms for large group classes.</p>
+              <p class="paper-note">Gives direct online L1-multicalibration algorithms with improved rates and an oracle-efficient variant for large or infinite group families.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2601.05245">Optimal Lower Bounds for Online Multicalibration</a></p>
@@ -492,7 +492,7 @@
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2605.09273">Instance-Adaptive Online Multicalibration</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Zhiming Huang, Jamie Morgenstern, Aaron Roth, Claire Jie Zhang. <strong>Publication:</strong> arXiv, 2026.</p>
-              <p class="paper-note">Develops online multicalibration algorithms whose guarantees adapt to the difficulty of the realized instance sequence.</p>
+              <p class="paper-note">Gives an efficient online multicalibration algorithm that recovers worst-case-optimal rates while adapting to easier stochastic and piecewise-stationary instances.</p>
             </li>
           </ul>
         </section>
@@ -503,17 +503,17 @@
             <li class="paper">
               <p class="paper-title"><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8794832/">Universal Adaptability: Target-Independent Inference that Competes with Propensity Scoring</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Michael P. Kim, Christoph Kern, Shafi Goldwasser, Frauke Kreuter, Omer Reingold. <strong>Publication:</strong> PNAS, 2022.</p>
-              <p class="paper-note">Applies multicalibration-style target-independent inference to population adaptation, competing with propensity-score methods without knowing the target population.</p>
+              <p class="paper-note">Uses multicalibration to build a single source-population estimator whose inferences remain valid across many downstream target populations.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.ITCS.2023.41">HappyMap: A Generalized Multicalibration Method</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Zhun Deng, Cynthia Dwork, Linjun Zhang. <strong>Publication:</strong> ITCS 2023.</p>
-              <p class="paper-note">Generalizes multicalibration into a framework that covers applications including covariate shift, missing data, and subgroup validity.</p>
+              <p class="paper-note">Introduces s-Happy multicalibration and a HappyMap meta-algorithm that unifies and extends applications to covariate shift, missing data, uncertainty, and fairness.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2406.00661">Bridging Multicalibration and Out-of-Distribution Generalization Beyond Covariate Shift</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Jiayun Wu, Jiashuo Liu, Peng Cui, Zhiwei Steven Wu. <strong>Publication:</strong> NeurIPS 2024.</p>
-              <p class="paper-note">Uses multicalibration-based ideas to handle out-of-distribution generalization beyond ordinary covariate shift assumptions.</p>
+              <p class="paper-note">Extends multicalibration to label-dependent grouping functions, linking it to invariance and robust out-of-distribution generalization beyond covariate shift.</p>
             </li>
           </ul>
         </section>
@@ -524,17 +524,17 @@
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2101.01739">Online Multivalid Learning: Means, Moments, and Prediction Intervals</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Varun Gupta, Christopher Jung, Georgy Noarov, Mallesh M. Pai, Aaron Roth. <strong>Publication:</strong> ITCS 2022.</p>
-              <p class="paper-note">Introduces online multivalid guarantees for means, moments, and prediction intervals, connecting multicalibration to uncertainty quantification.</p>
+              <p class="paper-note">Introduces adversarial online multivalid learning for means, moments, and prediction intervals, giving subgroup-conditional uncertainty guarantees for black-box predictors.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2206.01067">Practical Adversarial Multivalid Conformal Prediction</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Osbert Bastani, Varun Gupta, Christopher Jung, Georgy Noarov, Ramya Ramalingam, Aaron Roth. <strong>Publication:</strong> NeurIPS 2022.</p>
-              <p class="paper-note">Provides practical algorithms for multivalid conformal prediction in adversarial and subgroup-conditional settings.</p>
+              <p class="paper-note">Gives a lightweight sequential conformal method with threshold-conditional and subgroup-conditional empirical coverage guarantees without a held-out calibration set.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2209.15145">Batch Multivalid Conformal Prediction</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Christopher Jung, Georgy Noarov, Ramya Ramalingam, Aaron Roth. <strong>Publication:</strong> ICLR 2023.</p>
-              <p class="paper-note">Develops batch algorithms for conformal prediction intervals with multivalid coverage guarantees over many groups.</p>
+              <p class="paper-note">Develops batch conformal algorithms whose coverage guarantees hold simultaneously conditional on group membership and nonconformity threshold.</p>
             </li>
           </ul>
         </section>
@@ -545,57 +545,57 @@
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2011.13426">Outcome Indistinguishability</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Cynthia Dwork, Michael Kim, Omer Reingold, Guy Rothblum, Gal Yona. <strong>Publication:</strong> STOC 2021.</p>
-              <p class="paper-note">Introduces outcome indistinguishability as a computational indistinguishability framework for judging predictive models beyond standard loss.</p>
+              <p class="paper-note">Introduces outcome indistinguishability, requiring a predictor-induced generative model of outcomes to be hard for efficient tests to refute from real observations.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2109.05389">Omnipredictors</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Parikshit Gopalan, Adam Tauman Kalai, Omer Reingold, Vatsal Sharan, Udi Wieder. <strong>Publication:</strong> ITCS 2022.</p>
-              <p class="paper-note">Introduces omniprediction, showing that a single calibrated predictor can support near-optimal decisions for many downstream loss functions.</p>
+              <p class="paper-note">Introduces omniprediction as loss-oblivious learning, where one predictor can be post-processed to compete with a hypothesis class for many downstream losses.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2210.08649">Loss Minimization through the Lens of Outcome Indistinguishability</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Parikshit Gopalan, Lunjia Hu, Michael Kim, Omer Reingold, Udi Wieder. <strong>Publication:</strong> arXiv, 2022.</p>
-              <p class="paper-note">Uses outcome indistinguishability to unify loss minimization and calibrated prediction guarantees.</p>
+              <p class="paper-note">Shows that loss outcome indistinguishability implies omniprediction and can be decomposed into calibration plus calibrated multiaccuracy.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2305.18764">When Does Optimizing a Proper Loss Yield Calibration?</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Jaroslaw Blasiok, Parikshit Gopalan, Lunjia Hu, Preetum Nakkiran. <strong>Publication:</strong> NeurIPS 2023.</p>
-              <p class="paper-note">Characterizes when optimizing a proper loss over a restricted model class yields calibration-like guarantees.</p>
+              <p class="paper-note">Shows that local optimality for proper-loss minimization under Lipschitz post-processing is equivalent, up to approximation, to smooth calibration.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2302.06726">Swap Agnostic Learning, or Characterizing Omniprediction via Multicalibration</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Parikshit Gopalan, Michael Kim, Omer Reingold. <strong>Publication:</strong> NeurIPS 2023.</p>
-              <p class="paper-note">Characterizes omniprediction via multicalibration and swap-agnostic learning, tightening the conceptual connection between these notions.</p>
+              <p class="paper-note">Introduces swap agnostic learning and proves equivalences among swap omniprediction, multicalibration variants, and outcome indistinguishability notions.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2209.07463">Omnipredictors for Constrained Optimization</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Lunjia Hu, Inbal Livni Navon, Omer Reingold, Chutong Yang. <strong>Publication:</strong> ICML 2023.</p>
-              <p class="paper-note">Extends omniprediction guarantees to downstream constrained optimization problems.</p>
+              <p class="paper-note">Extends omniprediction to settings where both the downstream loss and constraints are unknown at learning time but later imposed through known subpopulations.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2301.13767">Multicalibration as Boosting for Regression</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Ira Globus-Harris, Declan Harrison, Michael Kearns, Aaron Roth, Jessica Sorrell. <strong>Publication:</strong> ICML 2023.</p>
-              <p class="paper-note">Shows how multicalibration can be viewed as a boosting-style method for regression.</p>
+              <p class="paper-note">Characterizes multicalibration through a squared-error swap-regret condition and gives a regression-oracle boosting algorithm with agnostic guarantees.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2304.09424">Loss Minimization Yields Multicalibration for Large Neural Networks</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Jaroslaw Blasiok, Parikshit Gopalan, Lunjia Hu, Adam Tauman Kalai, Preetum Nakkiran. <strong>Publication:</strong> ITCS 2024.</p>
-              <p class="paper-note">Shows that, under expressivity assumptions, squared-loss minimization by large neural networks can imply multicalibration against smaller-network groups.</p>
+              <p class="paper-note">Shows that minimizing squared loss over sufficiently expressive neural networks can imply multicalibration with respect to smaller neural-network group classes.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2307.08999">Oracle Efficient Online Multicalibration and Omniprediction</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Sumegha Garg, Christopher Jung, Omer Reingold, Aaron Roth. <strong>Publication:</strong> SODA 2024.</p>
-              <p class="paper-note">Gives oracle-efficient algorithms for online multicalibration and omniprediction in adversarial settings.</p>
+              <p class="paper-note">Develops oracle-efficient online multicalibration for infinite benchmark classes and derives the first oracle-efficient online omnipredictor.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2505.20885">Improved Bounds for Swap Multicalibration and Swap Omniprediction</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Haipeng Luo, Spandan Senapati, Vatsal Sharan. <strong>Publication:</strong> NeurIPS 2025.</p>
-              <p class="paper-note">Improves rates for swap multicalibration and swap omniprediction in online and distributional settings.</p>
+              <p class="paper-note">Improves online swap multicalibration and swap omniprediction rates and translates them into better distributional sample-complexity bounds.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2501.17205">Near-Optimal Algorithms for Omniprediction</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Princewill Okoroafor, Robert Kleinberg, Michael P. Kim. <strong>Publication:</strong> FOCS 2025.</p>
-              <p class="paper-note">Provides near-optimal online and offline algorithms for omniprediction with oracle-efficient guarantees.</p>
+              <p class="paper-note">Gives near-optimal online and offline omniprediction algorithms whose online regret nearly matches single-loss learning rates.</p>
             </li>
           </ul>
         </section>
@@ -606,12 +606,12 @@
             <li class="paper">
               <p class="paper-title"><a href="https://proceedings.mlr.press/v195/dwork23a.html">From Pseudorandomness to Multi-Group Fairness and Back</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Cynthia Dwork, Daniel Lee, Huijia Lin, Pranay Tankala. <strong>Publication:</strong> COLT 2023.</p>
-              <p class="paper-note">Connects multi-group fairness notions to pseudorandomness, showing transfers between fairness-style guarantees and complexity-theoretic primitives.</p>
+              <p class="paper-note">Connects multi-group fairness to pseudorandomness through statistical-distance variants of multicalibration, yielding algorithms and a real-valued hardcore lemma.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2312.17223">Complexity-Theoretic Implications of Multicalibration</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Silvia Casacuberta, Cynthia Dwork, Salil Vadhan. <strong>Publication:</strong> STOC 2024.</p>
-              <p class="paper-note">Derives complexity-theoretic consequences of multicalibration, linking it to hardcore lemmas and dense-model style results.</p>
+              <p class="paper-note">Uses multicalibration to strengthen regularity-lemma applications including hardcore lemmas, dense-model theorems, and conditional pseudo-min-entropy equivalences.</p>
             </li>
           </ul>
         </section>
@@ -622,42 +622,42 @@
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2107.05719">Calibrating Predictions to Decisions: A Novel Approach to Multi-Class Calibration</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Shengjia Zhao, Michael P. Kim, Roshni Sahoo, Tengyu Ma, Stefano Ermon. <strong>Publication:</strong> NeurIPS 2021.</p>
-              <p class="paper-note">Introduces decision calibration for multiclass predictions, relaxing full distribution calibration to indistinguishability for downstream decision-makers.</p>
+              <p class="paper-note">Introduces decision calibration for multiclass prediction, replacing infeasible distribution calibration with indistinguishability to bounded-action downstream decision-makers.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2211.16886">A Unifying Theory of Distance from Calibration</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Jaroslaw Blasiok, Parikshit Gopalan, Lunjia Hu, Preetum Nakkiran. <strong>Publication:</strong> STOC 2023.</p>
-              <p class="paper-note">Develops a unified theory of calibration distance, clarifying how different calibration error measures relate.</p>
+              <p class="paper-note">Defines distance to the nearest calibrated predictor as a ground-truth calibration metric and identifies efficiently estimable calibration measures consistent with it.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2402.08753">Forecasting for Swap Regret for All Downstream Agents</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Aaron Roth, Mirah Shi. <strong>Publication:</strong> EC 2024.</p>
-              <p class="paper-note">Shows how event-unbiased forecasts can guarantee low swap regret for all downstream agents without knowing their utilities.</p>
+              <p class="paper-note">Shows that event-unbiased forecasts can give all downstream best-responding agents low swap regret with better dimension dependence than calibrated forecasts.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2407.13979">Truthfulness of Calibration Measures</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Nika Haghtalab, Mingda Qiao, Kunhe Yang, Eric Zhao. <strong>Publication:</strong> NeurIPS 2024.</p>
-              <p class="paper-note">Studies which calibration measures are incentive compatible for forecasters and which can be gamed.</p>
+              <p class="paper-note">Shows that many existing calibration measures are not truthful and introduces subsampled smooth calibration error as a more incentive-compatible alternative.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2402.11410">An Elementary Predictor Obtaining 2 sqrt(T) + 1 Distance to Calibration</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Eshwar Ram Arunachaleswaran, Natalie Collina, Aaron Roth, Mirah Shi. <strong>Publication:</strong> SODA 2025.</p>
-              <p class="paper-note">Gives a simple forecasting algorithm with near-optimal distance-to-calibration guarantees.</p>
+              <p class="paper-note">Resolves the explicit-algorithm problem for distance to calibration by giving a simple deterministic predictor with O(sqrt(T)) adversarial error.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://proceedings.mlr.press/v267/noarov25b.html">High-Dimensional Prediction for Sequential Decision Making</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Georgy Noarov, Ramya Ramalingam, Aaron Roth, Stephan Xie. <strong>Publication:</strong> ICML 2025.</p>
-              <p class="paper-note">Develops efficient high-dimensional event-unbiased prediction with applications to sequential decision-making and multicalibration.</p>
+              <p class="paper-note">Gives efficient high-dimensional event-unbiased forecasts that support downstream decision-makers, conditional regret guarantees, and online multicalibration rates.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://proceedings.mlr.press/v291/qiao25a.html">Truthfulness of Decision-Theoretic Calibration Measures</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Mingda Qiao, Eric Zhao. <strong>Publication:</strong> COLT 2025.</p>
-              <p class="paper-note">Extends truthfulness questions to decision-theoretic calibration measures tied to downstream utility.</p>
+              <p class="paper-note">Introduces a decision-theoretic calibration measure that is both truthful and useful for downstream no-regret decision-making, while proving limits for such measures.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2504.15582">Smooth Calibration and Decision Making</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Jason Hartline, Yifan Wu, Yunran Yang. <strong>Publication:</strong> FORC 2025.</p>
-              <p class="paper-note">Studies smooth calibration notions tailored to downstream decision-making guarantees.</p>
+              <p class="paper-note">Shows how post-processing low distance-to-calibration forecasts can achieve decision-theoretic calibration measures such as ECE and calibration decision loss.</p>
             </li>
           </ul>
         </section>
@@ -668,12 +668,12 @@
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2411.19791">Tractable Agreement Protocols</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Natalie Collina, Surbhi Goel, Varun Gupta, Aaron Roth. <strong>Publication:</strong> STOC 2025.</p>
-              <p class="paper-note">Develops computationally tractable protocols for reaching agreement among predictors, connecting agreement dynamics to calibrated learning.</p>
+              <p class="paper-note">Turns learning algorithms into efficient agreement protocols using tractable calibration relaxations of Bayesian rationality.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2504.06075">Collaborative Prediction: Tractable Information Aggregation via Agreement</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Natalie Collina, Ira Globus-Harris, Surbhi Goel, Varun Gupta, Aaron Roth, Mirah Shi. <strong>Publication:</strong> SODA 2026.</p>
-              <p class="paper-note">Uses agreement protocols for tractable information aggregation among predictors with different information.</p>
+              <p class="paper-note">Gives efficient collaboration protocols that aggregate predictions from parties with different features without requiring either party to reveal those features.</p>
             </li>
           </ul>
         </section>
@@ -684,12 +684,12 @@
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2406.06487">When is Multicalibration Post-Processing Necessary?</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Dutch Hansen, Siddartha Devic, Preetum Nakkiran, Vatsal Sharan. <strong>Publication:</strong> NeurIPS 2024.</p>
-              <p class="paper-note">Empirically studies when multicalibration post-processing improves models across tabular, vision, language, and model-scale settings.</p>
+              <p class="paper-note">Empirically maps when multicalibration post-processing helps, finding that already calibrated models are often relatively multicalibrated while uncalibrated large models can benefit.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://proceedings.mlr.press/v235/detommaso24a.html">Multicalibration for Confidence Scoring in LLMs</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Gianluca Detommaso, Martin Andres Bertran, Riccardo Fogliato, Aaron Roth. <strong>Publication:</strong> ICML 2024.</p>
-              <p class="paper-note">Applies multicalibration to confidence scoring for large language models, improving reliability of stated confidence.</p>
+              <p class="paper-note">Applies multicalibration to LLM confidence scoring using embedding clusters and self-annotation groups, with algorithmic variants that reduce overfitting.</p>
             </li>
           </ul>
         </section>
@@ -700,17 +700,17 @@
             <li class="paper">
               <p class="paper-title"><a href="https://cseweb.ucsd.edu/~elkan/calibrated.pdf">Obtaining Calibrated Probability Estimates from Decision Trees and Naive Bayesian Classifiers</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Bianca Zadrozny, Charles Elkan. <strong>Publication:</strong> ICML 2001.</p>
-              <p class="paper-note">Introduces practical post-processing methods for calibrating probability estimates from common classifiers.</p>
+              <p class="paper-note">Compares practical methods for calibrating decision-tree and naive Bayes probabilities, recommending binning for naive Bayes and smoothing or curtailment for trees.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://icml.cc/Conferences/2005/proceedings/papers/079_GoodProbabilities_NiculescuMizilCaruana.pdf">Predicting Good Probabilities with Supervised Learning</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Alexandru Niculescu-Mizil, Rich Caruana. <strong>Publication:</strong> ICML 2005.</p>
-              <p class="paper-note">Systematically evaluates calibration methods for supervised learning and popularizes reliability diagrams and probability calibration practice.</p>
+              <p class="paper-note">Analyzes characteristic probability distortions across supervised learning algorithms and evaluates Platt scaling and isotonic regression as calibration fixes.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/1706.04599">On Calibration of Modern Neural Networks</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Chuan Guo, Geoff Pleiss, Yu Sun, Kilian Q. Weinberger. <strong>Publication:</strong> ICML 2017.</p>
-              <p class="paper-note">Shows that modern neural networks are often miscalibrated and that simple temperature scaling is a strong baseline.</p>
+              <p class="paper-note">Shows that modern neural networks are often overconfident and that temperature scaling is a simple, strong post-processing baseline for calibration.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/1910.12656">Beyond Temperature Scaling: Obtaining Well-Calibrated Multiclass Probabilities with Dirichlet Calibration</a></p>
