@@ -1,6 +1,31 @@
 (function (global) {
   "use strict";
 
+  const CALIBRATION_GROUPS = [
+    {
+      id: "coast",
+      label: "Coast days",
+      applies: (context) => context.region === "coast"
+    },
+    {
+      id: "inland",
+      label: "Inland days",
+      applies: (context) => context.region === "inland"
+    },
+    {
+      id: "morning",
+      label: "Morning rounds",
+      applies: (context) => context.period === "morning"
+    },
+    {
+      id: "evening",
+      label: "Evening rounds",
+      applies: (context) => context.period === "evening"
+    }
+  ];
+
+  const DEFAULT_ENABLED_CALIBRATION_GROUPS = CALIBRATION_GROUPS.map((group) => group.id);
+
   const DEFAULT_OPTIONS = {
     eta: 2.5,
     slackFactor: 0.2,
@@ -9,6 +34,7 @@
     startDepth: 2,
     eviTieSlack: 0.005,
     targetDecay: 0.92,
+    enabledCalibrationGroups: DEFAULT_ENABLED_CALIBRATION_GROUPS,
     rng: Math.random
   };
 
@@ -100,8 +126,22 @@
   class CalibrationGameCore {
     constructor(options = {}) {
       this.options = { ...DEFAULT_OPTIONS, ...options };
+      this.options.enabledCalibrationGroups = this.normalizeCalibrationGroups(
+        this.options.enabledCalibrationGroups
+      );
       this.rng = this.options.rng;
       this.reset();
+    }
+
+    normalizeCalibrationGroups(groupIds) {
+      const valid = new Set(CALIBRATION_GROUPS.map((group) => group.id));
+      return Array.from(new Set(groupIds || DEFAULT_ENABLED_CALIBRATION_GROUPS))
+        .filter((groupId) => valid.has(groupId));
+    }
+
+    setEnabledCalibrationGroups(groupIds) {
+      this.options.enabledCalibrationGroups = this.normalizeCalibrationGroups(groupIds);
+      return this.reset();
     }
 
     reset() {
@@ -131,21 +171,27 @@
       return DECISION_MAKERS.filter((maker) => maker.applies(context));
     }
 
-    decisionGroupIds(context, prediction) {
-      return this.activeDecisionMakers(context).map((maker) => {
-        const action = this.bestResponse(maker, prediction);
-        return `${maker.id}:${action}`;
-      });
+    enabledCalibrationGroupSet() {
+      return new Set(this.options.enabledCalibrationGroups || DEFAULT_ENABLED_CALIBRATION_GROUPS);
     }
 
-    testGroupIds(context, prediction) {
-      return ["overall", ...this.decisionGroupIds(context, prediction)];
+    activeCalibrationGroups(context) {
+      const enabled = this.enabledCalibrationGroupSet();
+      return CALIBRATION_GROUPS.filter((group) => enabled.has(group.id) && group.applies(context));
+    }
+
+    calibrationGroupIds(context) {
+      return this.activeCalibrationGroups(context).map((group) => group.id);
+    }
+
+    testGroupIds(context) {
+      return ["overall", ...this.calibrationGroupIds(context)];
     }
 
     allTestGroupIds() {
       return [
         "overall",
-        ...DECISION_MAKERS.flatMap((maker) => [`${maker.id}:bring`, `${maker.id}:leave`])
+        ...CALIBRATION_GROUPS.map((group) => group.id)
       ];
     }
 
@@ -157,15 +203,13 @@
       return action === "bring" ? outcome - maker.cost : 0;
     }
 
-    decisionGroupLabel(groupId) {
+    calibrationGroupLabel(groupId) {
       if (groupId === "overall") {
         return "All forecasts";
       }
 
-      const [makerId, action] = groupId.split(":");
-      const maker = DECISION_MAKERS.find((item) => item.id === makerId);
-      const makerLabel = maker ? maker.label : makerId;
-      return `${makerLabel}: ${action === "bring" ? "bring umbrella" : "leave umbrella"}`;
+      const group = CALIBRATION_GROUPS.find((item) => item.id === groupId);
+      return group ? group.label : groupId;
     }
 
     expertKey(groupId, bin, sign) {
@@ -181,13 +225,13 @@
     }
 
     targetFor(context) {
-      const activeMakers = this.activeDecisionMakers(context);
+      const activeGroupIds = ["overall", ...this.calibrationGroupIds(context)];
       let numerator = 0;
       let denominator = 0;
 
-      for (const maker of activeMakers) {
-        const stats = this.groupTargets.get(maker.id) || { sum: 0, count: 0 };
-        const weight = maker.id === "general" ? 0.45 : 1;
+      for (const groupId of activeGroupIds) {
+        const stats = this.groupTargets.get(groupId) || { sum: 0, count: 0 };
+        const weight = groupId === "overall" ? 0.55 : 1;
         numerator += weight * ((stats.sum + 0.5) / (stats.count + 1));
         denominator += weight;
       }
@@ -209,7 +253,11 @@
           label: maker.label,
           cost: maker.cost
         })),
-        decisionGroups: this.decisionGroupIds(context, this.bins[sampledIndex].mid),
+        activeCalibrationGroups: this.activeCalibrationGroups(context).map((group) => ({
+          id: group.id,
+          label: group.label
+        })),
+        enabledCalibrationGroups: this.options.enabledCalibrationGroups.slice(),
         sampledIndex,
         prediction: this.bins[sampledIndex].mid,
         distribution: solution.probs.map((probability, index) => ({
@@ -231,7 +279,7 @@
       let maxLogit = -Infinity;
 
       for (const bin of this.bins) {
-        for (const groupId of this.testGroupIds(context, bin.mid)) {
+        for (const groupId of this.testGroupIds(context)) {
           for (const sign of ["+", "-"]) {
             const logit = this.options.eta * this.getScore(groupId, bin, sign);
             weightedExperts.push({ bin, groupId, sign, logit });
@@ -255,7 +303,7 @@
         let signedWeight = 0;
         let totalWeight = 0;
 
-        for (const groupId of this.testGroupIds(context, bin.mid)) {
+        for (const groupId of this.testGroupIds(context)) {
           const plus = lambdas.get(this.expertKey(groupId, bin, "+")) || 0;
           const minus = lambdas.get(this.expertKey(groupId, bin, "-")) || 0;
           signedWeight += plus - minus;
@@ -393,7 +441,7 @@
           continue;
         }
 
-        for (const groupId of this.testGroupIds(round.context, bin.mid)) {
+        for (const groupId of this.testGroupIds(round.context)) {
           const plusUpdate = probability * (y - bin.mid - slack);
           const minusUpdate = probability * (bin.mid - y - slack);
           this.setScore(groupId, bin, "+", this.getScore(groupId, bin, "+") + plusUpdate);
@@ -402,18 +450,18 @@
       }
 
       this.decayTargets();
-      for (const maker of this.activeDecisionMakers(round.context)) {
-        const stats = this.groupTargets.get(maker.id) || { sum: 0, count: 0 };
+      for (const groupId of ["overall", ...this.calibrationGroupIds(round.context)]) {
+        const stats = this.groupTargets.get(groupId) || { sum: 0, count: 0 };
         stats.sum += y;
         stats.count += 1;
-        this.groupTargets.set(maker.id, stats);
+        this.groupTargets.set(groupId, stats);
       }
 
       const record = {
         roundNumber: round.roundNumber,
         context: round.context,
         activeMakers: round.activeMakers,
-        decisionGroups: this.decisionGroupIds(round.context, round.prediction),
+        activeCalibrationGroups: round.activeCalibrationGroups,
         outcome: y,
         prediction: round.prediction,
         expectedPrediction: round.expectedPrediction,
@@ -494,7 +542,7 @@
       let decisionCount = 0;
 
       for (const record of this.history) {
-        for (const groupId of this.testGroupIds(record.context, record.prediction)) {
+        for (const groupId of this.testGroupIds(record.context)) {
           const key = `${groupId}|${record.prediction.toFixed(4)}`;
           const stats = cellStats.get(key) || {
             groupId,
@@ -541,14 +589,12 @@
       let worstCell = 0;
       let worstCellLabel = "n/a";
       for (const stats of cellStats.values()) {
-        if (stats.groupId !== "overall") {
-          groupTotals.set(stats.groupId, (groupTotals.get(stats.groupId) || 0) + Math.abs(stats.residual));
-        }
+        groupTotals.set(stats.groupId, (groupTotals.get(stats.groupId) || 0) + Math.abs(stats.residual));
         if (stats.count >= 2) {
           const cellError = Math.abs(stats.residual) / stats.count;
-          if (stats.groupId !== "overall" && cellError > worstCell) {
+          if (cellError > worstCell) {
             worstCell = cellError;
-            worstCellLabel = `${this.decisionGroupLabel(stats.groupId)} @ ${formatProbability(stats.prediction)}`;
+            worstCellLabel = `${this.calibrationGroupLabel(stats.groupId)} @ ${formatProbability(stats.prediction)}`;
           }
         }
       }
@@ -564,7 +610,7 @@
         const normalized = value / totalRounds;
         if (normalized > multicalibrationError) {
           multicalibrationError = normalized;
-          worstGroup = this.decisionGroupLabel(groupId);
+          worstGroup = this.calibrationGroupLabel(groupId);
         }
       }
 
@@ -621,6 +667,8 @@
           mass: bin.mass
         })),
         decisionMakers: DECISION_MAKERS,
+        calibrationGroups: CALIBRATION_GROUPS,
+        enabledCalibrationGroups: this.options.enabledCalibrationGroups.slice(),
         strategies: STRATEGIES
       };
     }
@@ -636,6 +684,8 @@
       round: root.querySelector("[data-game-round]"),
       context: root.querySelector("[data-game-context]"),
       groups: root.querySelector("[data-game-groups]"),
+      calibrationGroups: root.querySelector("[data-game-calibration-groups]"),
+      calibrationToggles: Array.from(root.querySelectorAll("[data-game-calibration-group]")),
       forecast: root.querySelector("[data-game-forecast]"),
       expected: root.querySelector("[data-game-expected]"),
       target: root.querySelector("[data-game-target]"),
@@ -669,6 +719,13 @@
 
     elements.behavior.addEventListener("change", render);
 
+    elements.calibrationToggles.forEach((input) => {
+      input.addEventListener("change", () => {
+        core.setEnabledCalibrationGroups(selectedCalibrationGroups());
+        render();
+      });
+    });
+
     elements.run10.addEventListener("click", () => {
       runSelectedBehavior(10);
     });
@@ -691,6 +748,12 @@
       render();
     }
 
+    function selectedCalibrationGroups() {
+      return elements.calibrationToggles
+        .filter((input) => input.checked)
+        .map((input) => input.dataset.gameCalibrationGroup);
+    }
+
     function render() {
       const state = core.getState();
       const pending = state.pending;
@@ -703,6 +766,13 @@
         `<span>${pending.context.region === "coast" ? "Coast" : "Inland"}</span>`,
         `<span>${pending.context.period === "morning" ? "Morning" : "Evening"}</span>`
       ].join("");
+      elements.calibrationToggles.forEach((input) => {
+        input.checked = state.enabledCalibrationGroups.includes(input.dataset.gameCalibrationGroup);
+      });
+      elements.calibrationGroups.innerHTML = [
+        { label: "All forecasts" },
+        ...pending.activeCalibrationGroups
+      ].map((group) => `<span>${group.label}</span>`).join("");
       elements.groups.innerHTML = pending.activeMakers
         .map((maker) => `<span>${maker.label} c=${formatProbability(maker.cost)}</span>`)
         .join("");
@@ -870,12 +940,31 @@
     }
 
     render();
+    global.render_game_to_text = () => {
+      const state = core.getState();
+      const pending = state.pending;
+      return JSON.stringify({
+        round: pending.roundNumber,
+        context: pending.context,
+        enabledCalibrationGroups: state.enabledCalibrationGroups,
+        activeCalibrationGroups: pending.activeCalibrationGroups.map((group) => group.label),
+        activeDecisionMakers: pending.activeMakers.map((maker) => maker.label),
+        expectedPrediction: pending.expectedPrediction,
+        target: pending.target,
+        metrics: state.metrics
+      });
+    };
+    global.advanceTime = () => {
+      render();
+      return global.render_game_to_text();
+    };
     return core;
   }
 
   const api = {
     CalibrationGameCore,
     createCalibrationGame,
+    calibrationGroups: CALIBRATION_GROUPS,
     strategies: STRATEGIES,
     formatProbability
   };

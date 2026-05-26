@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Calibration Tutorial | ICML 2026</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230f766e'/%3E%3C/svg%3E">
   <style>
     :root {
       color-scheme: light;
@@ -348,6 +349,33 @@
       background: #eef8f6;
     }
 
+    .toggle-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .toggle-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 36px;
+      padding: 6px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfd;
+      color: var(--ink);
+      font-size: 0.9rem;
+      font-weight: 750;
+    }
+
+    .toggle-chip input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent);
+    }
+
     .demo-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -686,7 +714,8 @@
       }
 
       .auto-controls,
-      .outcome-controls {
+      .outcome-controls,
+      .toggle-grid {
         grid-template-columns: 1fr;
       }
 
@@ -757,8 +786,8 @@
       <p class="section-kicker">Interactive</p>
       <h2 id="demo-title">Rain Forecasting Game</h2>
       <p class="section-intro">
-        A short online game about forecasting rain, umbrella decisions, adaptive
-        prediction bins, and live calibration, multicalibration, and swap-regret metrics.
+        A short online game about forecasting rain, umbrella decisions, toggleable
+        context groups, adaptive prediction bins, and live calibration and swap-regret metrics.
       </p>
 
       <div class="demo-tool" data-calibration-game>
@@ -773,6 +802,28 @@
 
           <p class="metric-label">Weather setting</p>
           <div class="context-strip" data-game-context></div>
+
+          <p class="metric-label metric-label-spaced">Calibration groups</p>
+          <div class="toggle-grid" data-game-calibration-toggles>
+            <label class="toggle-chip">
+              <input type="checkbox" data-game-calibration-group="coast" checked>
+              Coast days
+            </label>
+            <label class="toggle-chip">
+              <input type="checkbox" data-game-calibration-group="inland" checked>
+              Inland days
+            </label>
+            <label class="toggle-chip">
+              <input type="checkbox" data-game-calibration-group="morning" checked>
+              Morning rounds
+            </label>
+            <label class="toggle-chip">
+              <input type="checkbox" data-game-calibration-group="evening" checked>
+              Evening rounds
+            </label>
+          </div>
+          <p class="metric-note">Overall calibration is always included; changing groups resets the run.</p>
+          <div class="group-strip" data-game-calibration-groups></div>
 
           <p class="metric-label metric-label-spaced">Umbrella agents</p>
           <div class="group-strip" data-game-groups></div>
@@ -828,7 +879,7 @@
         <aside class="demo-panel demo-panel-side" aria-label="Calibration metrics">
           <div class="demo-grid side-metrics">
             <div class="metric">
-              <p class="metric-label">Decision multicalibration</p>
+              <p class="metric-label">Context multicalibration</p>
               <p class="metric-value" data-game-mc-error>0</p>
             </div>
             <div class="metric">
@@ -853,7 +904,7 @@
           </div>
 
           <div class="metric metric-spaced">
-            <p class="metric-label">Worst umbrella group</p>
+            <p class="metric-label">Worst calibration cell</p>
             <p class="metric-value metric-value-small" data-game-worst-cell>n/a</p>
             <p class="metric-note" data-game-active-bins>4 bins</p>
           </div>
@@ -868,7 +919,7 @@
             <canvas data-game-chart aria-label="Calibration error over time"></canvas>
           </div>
           <div class="legend">
-            <span>Multicalibration</span>
+            <span>Context multicalibration</span>
             <span>Calibration</span>
             <span>Swap regret</span>
           </div>
