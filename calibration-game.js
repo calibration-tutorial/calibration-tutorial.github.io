@@ -15,59 +15,59 @@
   const DECISION_MAKERS = [
     {
       id: "general",
-      label: "General lender",
-      threshold: 0.5,
+      label: "Everyday commuter",
+      cost: 0.5,
       applies: () => true
     },
     {
-      id: "red",
-      label: "Red outreach",
-      threshold: 0.35,
-      applies: (context) => context.color === "red"
+      id: "coast",
+      label: "Coastal walker",
+      cost: 0.35,
+      applies: (context) => context.region === "coast"
     },
     {
-      id: "blue",
-      label: "Blue reviewer",
-      threshold: 0.65,
-      applies: (context) => context.color === "blue"
+      id: "inland",
+      label: "Inland minimalist",
+      cost: 0.65,
+      applies: (context) => context.region === "inland"
     },
     {
-      id: "early",
-      label: "Early triage",
-      threshold: 0.45,
-      applies: (context) => context.phase === "early"
+      id: "morning",
+      label: "Morning cyclist",
+      cost: 0.45,
+      applies: (context) => context.period === "morning"
     },
     {
-      id: "late",
-      label: "Late triage",
-      threshold: 0.55,
-      applies: (context) => context.phase === "late"
+      id: "evening",
+      label: "Evening hiker",
+      cost: 0.55,
+      applies: (context) => context.period === "evening"
     }
   ];
 
   const STRATEGIES = {
     "always-zero": {
-      label: "Always 0",
+      label: "Always dry",
       outcome: () => 0
     },
     "always-one": {
-      label: "Always 1",
+      label: "Always rain",
       outcome: () => 1
     },
     "red-blue": {
-      label: "Red -> 1",
-      outcome: (_history, context) => context.color === "red" ? 1 : 0
+      label: "Coast rain",
+      outcome: (_history, context) => context.region === "coast" ? 1 : 0
     },
     "early-late": {
-      label: "Early -> 1",
-      outcome: (_history, context) => context.phase === "early" ? 1 : 0
+      label: "Morning rain",
+      outcome: (_history, context) => context.period === "morning" ? 1 : 0
     },
     alternating: {
       label: "Alternating",
       outcome: (_history, _context, roundIndex) => roundIndex % 2 === 0 ? 1 : 0
     },
     shift: {
-      label: "Shift at 25",
+      label: "Storm at 25",
       outcome: (_history, _context, roundIndex) => roundIndex < 25 ? 0 : 1
     },
     reactive: {
@@ -122,8 +122,8 @@
 
     contextAt(roundIndex) {
       return {
-        color: roundIndex % 2 === 0 ? "red" : "blue",
-        phase: Math.floor(roundIndex / 5) % 2 === 0 ? "early" : "late"
+        region: roundIndex % 2 === 0 ? "coast" : "inland",
+        period: Math.floor(roundIndex / 5) % 2 === 0 ? "morning" : "evening"
       };
     }
 
@@ -145,16 +145,16 @@
     allTestGroupIds() {
       return [
         "overall",
-        ...DECISION_MAKERS.flatMap((maker) => [`${maker.id}:grant`, `${maker.id}:deny`])
+        ...DECISION_MAKERS.flatMap((maker) => [`${maker.id}:bring`, `${maker.id}:leave`])
       ];
     }
 
     bestResponse(maker, prediction) {
-      return prediction >= maker.threshold ? "grant" : "deny";
+      return prediction >= maker.cost ? "bring" : "leave";
     }
 
     decisionUtility(maker, action, outcome) {
-      return action === "grant" ? outcome - maker.threshold : 0;
+      return action === "bring" ? outcome - maker.cost : 0;
     }
 
     decisionGroupLabel(groupId) {
@@ -165,7 +165,7 @@
       const [makerId, action] = groupId.split(":");
       const maker = DECISION_MAKERS.find((item) => item.id === makerId);
       const makerLabel = maker ? maker.label : makerId;
-      return `${makerLabel}: ${action}`;
+      return `${makerLabel}: ${action === "bring" ? "bring umbrella" : "leave umbrella"}`;
     }
 
     expertKey(groupId, bin, sign) {
@@ -207,7 +207,7 @@
         activeMakers: this.activeDecisionMakers(context).map((maker) => ({
           id: maker.id,
           label: maker.label,
-          threshold: maker.threshold
+          cost: maker.cost
         })),
         decisionGroups: this.decisionGroupIds(context, this.bins[sampledIndex].mid),
         sampledIndex,
@@ -490,7 +490,7 @@
       const groupTotals = new Map();
       const makerStats = new Map();
       const totalRounds = Math.max(1, this.history.length);
-      let grantCount = 0;
+      let umbrellaCount = 0;
       let decisionCount = 0;
 
       for (const record of this.history) {
@@ -509,31 +509,31 @@
 
         for (const maker of this.activeDecisionMakers(record.context)) {
           const action = this.bestResponse(maker, record.prediction);
-          const grantUtility = this.decisionUtility(maker, "grant", record.outcome);
+          const bringUtility = this.decisionUtility(maker, "bring", record.outcome);
           const chosenUtility = this.decisionUtility(maker, action, record.outcome);
           const stats = makerStats.get(maker.id) || {
             maker,
             count: 0,
-            grants: 0,
+            brings: 0,
             utility: 0,
-            fixedGrantUtility: 0,
-            grantToDenyImprovement: 0,
-            denyToGrantImprovement: 0
+            fixedBringUtility: 0,
+            bringToLeaveImprovement: 0,
+            leaveToBringImprovement: 0
           };
 
           stats.count += 1;
-          stats.grants += action === "grant" ? 1 : 0;
+          stats.brings += action === "bring" ? 1 : 0;
           stats.utility += chosenUtility;
-          stats.fixedGrantUtility += grantUtility;
+          stats.fixedBringUtility += bringUtility;
 
-          if (action === "grant") {
-            stats.grantToDenyImprovement += 0 - chosenUtility;
+          if (action === "bring") {
+            stats.bringToLeaveImprovement += 0 - chosenUtility;
           } else {
-            stats.denyToGrantImprovement += grantUtility - chosenUtility;
+            stats.leaveToBringImprovement += bringUtility - chosenUtility;
           }
 
           makerStats.set(maker.id, stats);
-          grantCount += action === "grant" ? 1 : 0;
+          umbrellaCount += action === "bring" ? 1 : 0;
           decisionCount += 1;
         }
       }
@@ -574,11 +574,11 @@
 
       for (const stats of makerStats.values()) {
         const denominator = Math.max(1, stats.count);
-        const bestFixedUtility = Math.max(0, stats.fixedGrantUtility);
+        const bestFixedUtility = Math.max(0, stats.fixedBringUtility);
         const decisionRegret = Math.max(0, bestFixedUtility - stats.utility) / denominator;
         const swapRegret = (
-          Math.max(0, stats.grantToDenyImprovement) +
-          Math.max(0, stats.denyToGrantImprovement)
+          Math.max(0, stats.bringToLeaveImprovement) +
+          Math.max(0, stats.leaveToBringImprovement)
         ) / denominator;
 
         if (decisionRegret > maxDecisionRegret) {
@@ -597,7 +597,7 @@
         multicalibrationError,
         maxDecisionRegret,
         maxSwapRegret,
-        grantRate: decisionCount ? grantCount / decisionCount : 0,
+        umbrellaRate: decisionCount ? umbrellaCount / decisionCount : 0,
         worstCell,
         worstCellLabel,
         worstGroup,
@@ -639,13 +639,15 @@
       forecast: root.querySelector("[data-game-forecast]"),
       expected: root.querySelector("[data-game-expected]"),
       target: root.querySelector("[data-game-target]"),
+      utility: root.querySelector("[data-game-utility]"),
       distribution: root.querySelector("[data-game-distribution]"),
+      tree: root.querySelector("[data-game-tree]"),
       last: root.querySelector("[data-game-last]"),
       calError: root.querySelector("[data-game-cal-error]"),
       mcError: root.querySelector("[data-game-mc-error]"),
       decisionRegret: root.querySelector("[data-game-decision-regret]"),
       swapRegret: root.querySelector("[data-game-swap-regret]"),
-      grantRate: root.querySelector("[data-game-grant-rate]"),
+      umbrellaRate: root.querySelector("[data-game-umbrella-rate]"),
       worstAgent: root.querySelector("[data-game-worst-agent]"),
       decisionCount: root.querySelector("[data-game-decision-count]"),
       worstCell: root.querySelector("[data-game-worst-cell]"),
@@ -698,12 +700,13 @@
 
       elements.round.textContent = String(pending.roundNumber);
       elements.context.innerHTML = [
-        `<span>${pending.context.color === "red" ? "Red" : "Blue"}</span>`,
-        `<span>${pending.context.phase === "early" ? "Early" : "Late"}</span>`
+        `<span>${pending.context.region === "coast" ? "Coast" : "Inland"}</span>`,
+        `<span>${pending.context.period === "morning" ? "Morning" : "Evening"}</span>`
       ].join("");
       elements.groups.innerHTML = pending.activeMakers
-        .map((maker) => `<span>${maker.label} ${formatProbability(maker.threshold)}</span>`)
+        .map((maker) => `<span>${maker.label} c=${formatProbability(maker.cost)}</span>`)
         .join("");
+      renderUtility(pending.activeMakers);
       elements.forecast.textContent = "Locked";
       elements.expected.textContent = formatProbability(pending.expectedPrediction);
       elements.target.textContent = formatProbability(pending.target);
@@ -711,7 +714,7 @@
       elements.mcError.textContent = formatProbability(metrics.multicalibrationError);
       elements.decisionRegret.textContent = formatProbability(metrics.maxDecisionRegret);
       elements.swapRegret.textContent = formatProbability(metrics.maxSwapRegret);
-      elements.grantRate.textContent = `${Math.round(metrics.grantRate * 100)}%`;
+      elements.umbrellaRate.textContent = `${Math.round(metrics.umbrellaRate * 100)}%`;
       elements.worstAgent.textContent = `Worst: ${metrics.worstDecisionAgent}`;
       elements.decisionCount.textContent = `${metrics.decisionCount} decisions`;
       elements.worstCell.textContent = metrics.worstCellLabel === "n/a"
@@ -719,7 +722,7 @@
         : `${metrics.worstCellLabel}: ${formatProbability(metrics.worstCell)}`;
       elements.activeBins.textContent = `${metrics.activeBins} bins`;
       elements.last.textContent = last
-        ? `Round ${last.roundNumber}: forecast ${formatProbability(last.prediction)}, outcome ${last.outcome}`
+        ? `Round ${last.roundNumber}: rain forecast ${formatProbability(last.prediction)}, weather ${last.outcome ? "rain" : "dry"}`
         : "No completed rounds yet";
 
       elements.outcomes.forEach((button) => {
@@ -729,7 +732,18 @@
       elements.run50.disabled = !autoMode;
 
       renderDistribution(pending.distribution);
+      renderTree(state.bins);
       drawChart(elements.canvas, state.metricHistory);
+    }
+
+    function renderUtility(activeMakers) {
+      elements.utility.innerHTML = activeMakers.map((maker) => `
+        <div class="utility-row">
+          <span>${maker.label}</span>
+          <span>c=${formatProbability(maker.cost)}</span>
+          <span>bring if p >= ${formatProbability(maker.cost)}</span>
+        </div>
+      `).join("");
     }
 
     function renderDistribution(distribution) {
@@ -744,6 +758,42 @@
           </div>
         `;
       }).join("");
+    }
+
+    function renderTree(bins) {
+      const maxDepth = Math.max(...bins.map((bin) => bin.depth), 0);
+      const leafKeys = new Set(bins.map((bin) => `${bin.depth}:${bin.lo.toFixed(5)}`));
+      const levels = [];
+
+      for (let depth = 0; depth <= maxDepth; depth += 1) {
+        const nodes = new Map();
+        const scale = 2 ** depth;
+
+        for (const bin of bins) {
+          const index = Math.floor(bin.lo * scale + 1e-9);
+          const lo = index / scale;
+          const hi = (index + 1) / scale;
+          nodes.set(`${depth}:${lo.toFixed(5)}`, {
+            depth,
+            lo,
+            hi,
+            midpoint: (lo + hi) / 2,
+            isLeaf: leafKeys.has(`${depth}:${lo.toFixed(5)}`)
+          });
+        }
+
+        levels.push(Array.from(nodes.values()).sort((left, right) => left.lo - right.lo));
+      }
+
+      elements.tree.innerHTML = levels.map((nodes, depth) => `
+        <div class="tree-level" style="top: ${8 + depth * 24}px;">
+          ${nodes.map((node) => `
+            <span class="tree-node${node.isLeaf ? " is-leaf" : ""}" style="left: ${node.lo * 100}%; width: ${(node.hi - node.lo) * 100}%;">
+              ${node.isLeaf ? formatProbability(node.midpoint) : ""}
+            </span>
+          `).join("")}
+        </div>
+      `).join("");
     }
 
     function drawChart(canvas, metricHistory) {

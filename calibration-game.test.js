@@ -1,4 +1,4 @@
-const { CalibrationGameCore } = require("./calibration-game.js");
+const { CalibrationGameCore, strategies: gameStrategies } = require("./calibration-game.js");
 
 function seededRng(seed) {
   let state = seed >>> 0;
@@ -43,7 +43,7 @@ function summarize(strategyName, rounds) {
   }
 
   return {
-    strategy: strategyName,
+    strategy: gameStrategies[strategyName].label,
     rounds,
     mcMedian: percentile(multicalibrationValues, 0.5),
     mcP90: percentile(multicalibrationValues, 0.9),
