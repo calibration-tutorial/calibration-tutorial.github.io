@@ -253,6 +253,309 @@
       font-size: 0.98rem;
     }
 
+    .demo-section {
+      padding-bottom: 36px;
+    }
+
+    .demo-tool {
+      margin-top: 34px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 0.78fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .demo-panel {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .demo-panel-main {
+      padding: 22px;
+    }
+
+    .demo-panel-side {
+      padding: 18px;
+    }
+
+    .demo-topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .round-label {
+      color: var(--muted);
+      font-size: 0.84rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .round-number {
+      display: block;
+      color: var(--text);
+      font-size: 2.4rem;
+      font-weight: 850;
+      line-height: 1;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--soft);
+      color: var(--accent-strong);
+      font-size: 0.88rem;
+      font-weight: 800;
+    }
+
+    .context-strip,
+    .group-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 34px;
+      margin: 10px 0 0;
+    }
+
+    .context-strip span,
+    .group-strip span {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fbfcfd;
+      color: var(--ink);
+      font-size: 0.9rem;
+      font-weight: 750;
+    }
+
+    .context-strip span:first-child {
+      border-color: #d8b56f;
+      background: #fff8e8;
+    }
+
+    .context-strip span:nth-child(2) {
+      border-color: #acc7c2;
+      background: #eef8f6;
+    }
+
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .metric {
+      min-height: 92px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfd;
+    }
+
+    .metric-label {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .metric-value {
+      margin: 8px 0 0;
+      color: var(--text);
+      font-size: clamp(1.25rem, 3vw, 1.8rem);
+      font-weight: 850;
+      line-height: 1.1;
+    }
+
+    .metric-note {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .metric-label-spaced {
+      margin-top: 18px;
+    }
+
+    .metric-spaced {
+      margin-top: 12px;
+    }
+
+    .metric-value-small {
+      font-size: 1.1rem;
+    }
+
+    .side-metrics {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .outcome-controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .demo-button,
+    .outcome-button {
+      min-height: 42px;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      background: var(--accent);
+      color: #ffffff;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .outcome-button {
+      font-size: 1.2rem;
+    }
+
+    .demo-button.secondary {
+      border-color: var(--line);
+      background: #fbfcfd;
+      color: var(--ink);
+    }
+
+    .demo-button:hover,
+    .outcome-button:hover {
+      filter: brightness(0.96);
+    }
+
+    .demo-button:disabled,
+    .outcome-button:disabled {
+      border-color: var(--line);
+      background: #e7ebf0;
+      color: #8792a0;
+      cursor: not-allowed;
+      filter: none;
+    }
+
+    .auto-controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .reset-button {
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .control-row {
+      display: grid;
+      gap: 8px;
+      margin-top: 20px;
+    }
+
+    .control-row label {
+      color: var(--muted);
+      font-size: 0.84rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .control-row select {
+      width: 100%;
+      min-height: 42px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--ink);
+      font: inherit;
+      font-weight: 650;
+    }
+
+    .distribution {
+      display: grid;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .dist-row {
+      display: grid;
+      grid-template-columns: 48px minmax(0, 1fr) 42px;
+      align-items: center;
+      gap: 8px;
+      min-height: 22px;
+      color: var(--ink);
+      font-size: 0.86rem;
+      font-weight: 700;
+    }
+
+    .dist-row.is-muted {
+      opacity: 0.48;
+    }
+
+    .dist-track {
+      display: block;
+      height: 8px;
+      border-radius: 999px;
+      background: #edf1f5;
+      overflow: hidden;
+    }
+
+    .dist-fill {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--accent);
+    }
+
+    .chart-wrap {
+      height: 180px;
+      margin-top: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfd;
+      padding: 8px;
+    }
+
+    .chart-wrap canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.84rem;
+      font-weight: 700;
+    }
+
+    .legend span::before {
+      content: "";
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      margin-right: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    .legend span:nth-child(2)::before {
+      background: var(--gold);
+    }
+
     .footer {
       border-top: 1px solid var(--line);
       background: var(--panel);
@@ -280,6 +583,10 @@
         padding: 46px 0 54px;
       }
 
+      .demo-tool {
+        grid-template-columns: 1fr;
+      }
+
       .calibration-figure {
         min-height: 0;
       }
@@ -305,6 +612,20 @@
       .paper {
         padding: 14px;
       }
+
+      .demo-panel-main,
+      .demo-panel-side {
+        padding: 14px;
+      }
+
+      .demo-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .auto-controls,
+      .outcome-controls {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -313,6 +634,7 @@
     <nav class="nav" aria-label="Main navigation">
       <a class="brand" href="#">Calibration Tutorial</a>
       <div class="nav-links">
+        <a href="#demo">Demo</a>
         <a href="#reading-list">Reading List</a>
       </div>
     </nav>
@@ -359,6 +681,106 @@
             <circle cx="282" cy="66" r="6" fill="#0f766e"/>
           </svg>
         </figure>
+      </div>
+    </section>
+
+    <section id="demo" class="content demo-section" aria-labelledby="demo-title">
+      <p class="section-kicker">Interactive</p>
+      <h2 id="demo-title">Multicalibration Game</h2>
+      <p class="section-intro">
+        A short online game with adaptive prediction bins, a simplified no-regret
+        wrapper, and live calibration and multicalibration error.
+      </p>
+
+      <div class="demo-tool" data-calibration-game>
+        <section class="demo-panel demo-panel-main" aria-label="Calibration game">
+          <div class="demo-topline">
+            <div>
+              <span class="round-label">Round</span>
+              <span class="round-number" data-game-round>1</span>
+            </div>
+            <span class="status-pill">Sampled forecast hidden</span>
+          </div>
+
+          <p class="metric-label">Context</p>
+          <div class="context-strip" data-game-context></div>
+
+          <p class="metric-label metric-label-spaced">Active groups</p>
+          <div class="group-strip" data-game-groups></div>
+
+          <div class="demo-grid">
+            <div class="metric">
+              <p class="metric-label">Forecast</p>
+              <p class="metric-value" data-game-forecast>Locked</p>
+              <p class="metric-note" data-game-last>No completed rounds yet</p>
+            </div>
+            <div class="metric">
+              <p class="metric-label">Expected forecast</p>
+              <p class="metric-value" data-game-expected>0.5</p>
+              <p class="metric-note">Distribution mean</p>
+            </div>
+            <div class="metric">
+              <p class="metric-label">Adaptive target</p>
+              <p class="metric-value" data-game-target>0.5</p>
+              <p class="metric-note">Tie-break only</p>
+            </div>
+          </div>
+
+          <div class="outcome-controls" aria-label="Choose outcome">
+            <button class="outcome-button" type="button" data-game-outcome="0">0</button>
+            <button class="outcome-button" type="button" data-game-outcome="1">1</button>
+          </div>
+
+          <div class="control-row">
+            <label for="game-behavior">Automated behavior</label>
+            <select id="game-behavior" data-game-behavior>
+              <option value="manual">Manual</option>
+              <option value="always-zero">Always 0</option>
+              <option value="always-one">Always 1</option>
+              <option value="red-blue">Red -> 1, blue -> 0</option>
+              <option value="early-late">Early -> 1, late -> 0</option>
+              <option value="alternating">Alternating</option>
+              <option value="shift">Shift at round 25</option>
+              <option value="reactive">React to last forecast</option>
+            </select>
+          </div>
+
+          <div class="auto-controls">
+            <button class="demo-button secondary" type="button" data-game-run="10" disabled>Run 10</button>
+            <button class="demo-button secondary" type="button" data-game-run="50" disabled>Run 50</button>
+          </div>
+          <button class="demo-button secondary reset-button" type="button" data-game-reset>Reset</button>
+        </section>
+
+        <aside class="demo-panel demo-panel-side" aria-label="Calibration metrics">
+          <div class="demo-grid side-metrics">
+            <div class="metric">
+              <p class="metric-label">Calibration error</p>
+              <p class="metric-value" data-game-cal-error>0</p>
+            </div>
+            <div class="metric">
+              <p class="metric-label">Multicalibration</p>
+              <p class="metric-value" data-game-mc-error>0</p>
+            </div>
+          </div>
+
+          <div class="metric metric-spaced">
+            <p class="metric-label">Worst cell</p>
+            <p class="metric-value metric-value-small" data-game-worst-cell>n/a</p>
+            <p class="metric-note" data-game-active-bins>4 bins</p>
+          </div>
+
+          <p class="metric-label metric-label-spaced">Current mixed forecast</p>
+          <div class="distribution" data-game-distribution></div>
+
+          <div class="chart-wrap">
+            <canvas data-game-chart aria-label="Calibration error over time"></canvas>
+          </div>
+          <div class="legend">
+            <span>Multicalibration</span>
+            <span>Calibration</span>
+          </div>
+        </aside>
       </div>
     </section>
 
@@ -756,5 +1178,6 @@
       Calibration Tutorial for ICML 2026.
     </div>
   </footer>
+  <script src="calibration-game.js"></script>
 </body>
 </html>
