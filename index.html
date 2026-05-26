@@ -128,7 +128,7 @@
       gap: 10px;
     }
 
-    .presenters span {
+    .presenters a {
       display: inline-flex;
       align-items: center;
       min-height: 34px;
@@ -138,6 +138,14 @@
       color: var(--ink);
       background: #fbfcfd;
       font-weight: 700;
+      text-decoration: none;
+    }
+
+    .presenters a:hover,
+    .presenters a:focus-visible {
+      border-color: var(--accent);
+      color: var(--accent-strong);
+      background: var(--soft);
     }
 
     .calibration-figure {
@@ -289,7 +297,7 @@
         gap: 12px;
       }
 
-      .presenters span {
+      .presenters a {
         width: 100%;
         justify-content: center;
       }
@@ -321,9 +329,9 @@
             ideas in learning, fairness, decision-making, and information aggregation.
           </p>
           <div class="presenters" aria-label="Tutorial presenters">
-            <span>Aaron Roth</span>
-            <span>Natalie Collina</span>
-            <span>Ira Globus-Harris</span>
+            <a href="https://www.cis.upenn.edu/~aaroth/">Aaron Roth</a>
+            <a href="https://www.seas.upenn.edu/~ncollina/">Natalie Collina</a>
+            <a href="https://globusharris.github.io/">Ira Globus-Harris</a>
           </div>
         </div>
 
