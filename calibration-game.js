@@ -12,12 +12,37 @@
     rng: Math.random
   };
 
-  const GROUPS = [
-    { id: "all", label: "All days" },
-    { id: "red", label: "Red" },
-    { id: "blue", label: "Blue" },
-    { id: "early", label: "Early" },
-    { id: "late", label: "Late" }
+  const DECISION_MAKERS = [
+    {
+      id: "general",
+      label: "General lender",
+      threshold: 0.5,
+      applies: () => true
+    },
+    {
+      id: "red",
+      label: "Red outreach",
+      threshold: 0.35,
+      applies: (context) => context.color === "red"
+    },
+    {
+      id: "blue",
+      label: "Blue reviewer",
+      threshold: 0.65,
+      applies: (context) => context.color === "blue"
+    },
+    {
+      id: "early",
+      label: "Early triage",
+      threshold: 0.45,
+      applies: (context) => context.phase === "early"
+    },
+    {
+      id: "late",
+      label: "Late triage",
+      threshold: 0.55,
+      applies: (context) => context.phase === "late"
+    }
   ];
 
   const STRATEGIES = {
@@ -102,13 +127,45 @@
       };
     }
 
-    activeGroups(context) {
-      return ["all", context.color, context.phase];
+    activeDecisionMakers(context) {
+      return DECISION_MAKERS.filter((maker) => maker.applies(context));
     }
 
-    groupLabel(groupId) {
-      const group = GROUPS.find((item) => item.id === groupId);
-      return group ? group.label : groupId;
+    decisionGroupIds(context, prediction) {
+      return this.activeDecisionMakers(context).map((maker) => {
+        const action = this.bestResponse(maker, prediction);
+        return `${maker.id}:${action}`;
+      });
+    }
+
+    testGroupIds(context, prediction) {
+      return ["overall", ...this.decisionGroupIds(context, prediction)];
+    }
+
+    allTestGroupIds() {
+      return [
+        "overall",
+        ...DECISION_MAKERS.flatMap((maker) => [`${maker.id}:grant`, `${maker.id}:deny`])
+      ];
+    }
+
+    bestResponse(maker, prediction) {
+      return prediction >= maker.threshold ? "grant" : "deny";
+    }
+
+    decisionUtility(maker, action, outcome) {
+      return action === "grant" ? outcome - maker.threshold : 0;
+    }
+
+    decisionGroupLabel(groupId) {
+      if (groupId === "overall") {
+        return "All forecasts";
+      }
+
+      const [makerId, action] = groupId.split(":");
+      const maker = DECISION_MAKERS.find((item) => item.id === makerId);
+      const makerLabel = maker ? maker.label : makerId;
+      return `${makerLabel}: ${action}`;
     }
 
     expertKey(groupId, bin, sign) {
@@ -124,13 +181,13 @@
     }
 
     targetFor(context) {
-      const activeGroups = this.activeGroups(context);
+      const activeMakers = this.activeDecisionMakers(context);
       let numerator = 0;
       let denominator = 0;
 
-      for (const groupId of activeGroups) {
-        const stats = this.groupTargets.get(groupId) || { sum: 0, count: 0 };
-        const weight = groupId === "all" ? 0.45 : 1;
+      for (const maker of activeMakers) {
+        const stats = this.groupTargets.get(maker.id) || { sum: 0, count: 0 };
+        const weight = maker.id === "general" ? 0.45 : 1;
         numerator += weight * ((stats.sum + 0.5) / (stats.count + 1));
         denominator += weight;
       }
@@ -147,7 +204,12 @@
       return {
         roundNumber: roundIndex + 1,
         context,
-        activeGroups: this.activeGroups(context),
+        activeMakers: this.activeDecisionMakers(context).map((maker) => ({
+          id: maker.id,
+          label: maker.label,
+          threshold: maker.threshold
+        })),
+        decisionGroups: this.decisionGroupIds(context, this.bins[sampledIndex].mid),
         sampledIndex,
         prediction: this.bins[sampledIndex].mid,
         distribution: solution.probs.map((probability, index) => ({
@@ -164,13 +226,12 @@
     }
 
     solveEvi(context) {
-      const activeGroups = this.activeGroups(context);
       const target = this.targetFor(context);
       const weightedExperts = [];
       let maxLogit = -Infinity;
 
       for (const bin of this.bins) {
-        for (const groupId of activeGroups) {
+        for (const groupId of this.testGroupIds(context, bin.mid)) {
           for (const sign of ["+", "-"]) {
             const logit = this.options.eta * this.getScore(groupId, bin, sign);
             weightedExperts.push({ bin, groupId, sign, logit });
@@ -194,7 +255,7 @@
         let signedWeight = 0;
         let totalWeight = 0;
 
-        for (const groupId of activeGroups) {
+        for (const groupId of this.testGroupIds(context, bin.mid)) {
           const plus = lambdas.get(this.expertKey(groupId, bin, "+")) || 0;
           const minus = lambdas.get(this.expertKey(groupId, bin, "-")) || 0;
           signedWeight += plus - minus;
@@ -321,7 +382,6 @@
     submitOutcome(outcome) {
       const y = Number(outcome);
       const round = this.pending;
-      const activeGroups = round.activeGroups;
 
       for (let index = 0; index < this.bins.length; index += 1) {
         const bin = this.bins[index];
@@ -333,7 +393,7 @@
           continue;
         }
 
-        for (const groupId of activeGroups) {
+        for (const groupId of this.testGroupIds(round.context, bin.mid)) {
           const plusUpdate = probability * (y - bin.mid - slack);
           const minusUpdate = probability * (bin.mid - y - slack);
           this.setScore(groupId, bin, "+", this.getScore(groupId, bin, "+") + plusUpdate);
@@ -342,17 +402,18 @@
       }
 
       this.decayTargets();
-      for (const groupId of activeGroups) {
-        const stats = this.groupTargets.get(groupId) || { sum: 0, count: 0 };
+      for (const maker of this.activeDecisionMakers(round.context)) {
+        const stats = this.groupTargets.get(maker.id) || { sum: 0, count: 0 };
         stats.sum += y;
         stats.count += 1;
-        this.groupTargets.set(groupId, stats);
+        this.groupTargets.set(maker.id, stats);
       }
 
       const record = {
         roundNumber: round.roundNumber,
         context: round.context,
-        activeGroups,
+        activeMakers: round.activeMakers,
+        decisionGroups: this.decisionGroupIds(round.context, round.prediction),
         outcome: y,
         prediction: round.prediction,
         expectedPrediction: round.expectedPrediction,
@@ -401,9 +462,9 @@
     }
 
     inheritScores(parent, child) {
-      for (const group of GROUPS) {
+      for (const groupId of this.allTestGroupIds()) {
         for (const sign of ["+", "-"]) {
-          this.setScore(group.id, child, sign, this.getScore(group.id, parent, sign));
+          this.setScore(groupId, child, sign, this.getScore(groupId, parent, sign));
         }
       }
     }
@@ -427,10 +488,13 @@
     computeMetrics() {
       const cellStats = new Map();
       const groupTotals = new Map();
+      const makerStats = new Map();
       const totalRounds = Math.max(1, this.history.length);
+      let grantCount = 0;
+      let decisionCount = 0;
 
       for (const record of this.history) {
-        for (const groupId of this.activeGroups(record.context)) {
+        for (const groupId of this.testGroupIds(record.context, record.prediction)) {
           const key = `${groupId}|${record.prediction.toFixed(4)}`;
           const stats = cellStats.get(key) || {
             groupId,
@@ -442,30 +506,88 @@
           stats.residual += record.outcome - record.prediction;
           cellStats.set(key, stats);
         }
+
+        for (const maker of this.activeDecisionMakers(record.context)) {
+          const action = this.bestResponse(maker, record.prediction);
+          const grantUtility = this.decisionUtility(maker, "grant", record.outcome);
+          const chosenUtility = this.decisionUtility(maker, action, record.outcome);
+          const stats = makerStats.get(maker.id) || {
+            maker,
+            count: 0,
+            grants: 0,
+            utility: 0,
+            fixedGrantUtility: 0,
+            grantToDenyImprovement: 0,
+            denyToGrantImprovement: 0
+          };
+
+          stats.count += 1;
+          stats.grants += action === "grant" ? 1 : 0;
+          stats.utility += chosenUtility;
+          stats.fixedGrantUtility += grantUtility;
+
+          if (action === "grant") {
+            stats.grantToDenyImprovement += 0 - chosenUtility;
+          } else {
+            stats.denyToGrantImprovement += grantUtility - chosenUtility;
+          }
+
+          makerStats.set(maker.id, stats);
+          grantCount += action === "grant" ? 1 : 0;
+          decisionCount += 1;
+        }
       }
 
       let worstCell = 0;
       let worstCellLabel = "n/a";
       for (const stats of cellStats.values()) {
-        groupTotals.set(stats.groupId, (groupTotals.get(stats.groupId) || 0) + Math.abs(stats.residual));
+        if (stats.groupId !== "overall") {
+          groupTotals.set(stats.groupId, (groupTotals.get(stats.groupId) || 0) + Math.abs(stats.residual));
+        }
         if (stats.count >= 2) {
           const cellError = Math.abs(stats.residual) / stats.count;
-          if (cellError > worstCell) {
+          if (stats.groupId !== "overall" && cellError > worstCell) {
             worstCell = cellError;
-            worstCellLabel = `${this.groupLabel(stats.groupId)} @ ${formatProbability(stats.prediction)}`;
+            worstCellLabel = `${this.decisionGroupLabel(stats.groupId)} @ ${formatProbability(stats.prediction)}`;
           }
         }
       }
 
-      const calibrationError = (groupTotals.get("all") || 0) / totalRounds;
+      const overallCalibrationTotal = Array.from(cellStats.values())
+        .filter((stats) => stats.groupId === "overall")
+        .reduce((total, stats) => total + Math.abs(stats.residual), 0);
+      const calibrationError = overallCalibrationTotal / totalRounds;
       let multicalibrationError = 0;
-      let worstGroup = "All days";
+      let worstGroup = "n/a";
 
       for (const [groupId, value] of groupTotals.entries()) {
         const normalized = value / totalRounds;
         if (normalized > multicalibrationError) {
           multicalibrationError = normalized;
-          worstGroup = this.groupLabel(groupId);
+          worstGroup = this.decisionGroupLabel(groupId);
+        }
+      }
+
+      let maxDecisionRegret = 0;
+      let maxSwapRegret = 0;
+      let worstDecisionAgent = "n/a";
+
+      for (const stats of makerStats.values()) {
+        const denominator = Math.max(1, stats.count);
+        const bestFixedUtility = Math.max(0, stats.fixedGrantUtility);
+        const decisionRegret = Math.max(0, bestFixedUtility - stats.utility) / denominator;
+        const swapRegret = (
+          Math.max(0, stats.grantToDenyImprovement) +
+          Math.max(0, stats.denyToGrantImprovement)
+        ) / denominator;
+
+        if (decisionRegret > maxDecisionRegret) {
+          maxDecisionRegret = decisionRegret;
+        }
+
+        if (swapRegret > maxSwapRegret) {
+          maxSwapRegret = swapRegret;
+          worstDecisionAgent = stats.maker.label;
         }
       }
 
@@ -473,10 +595,15 @@
         round: this.history.length,
         calibrationError,
         multicalibrationError,
+        maxDecisionRegret,
+        maxSwapRegret,
+        grantRate: decisionCount ? grantCount / decisionCount : 0,
         worstCell,
         worstCellLabel,
         worstGroup,
-        activeBins: this.bins.length
+        worstDecisionAgent,
+        activeBins: this.bins.length,
+        decisionCount
       };
     }
 
@@ -493,7 +620,7 @@
           depth: bin.depth,
           mass: bin.mass
         })),
-        groups: GROUPS,
+        decisionMakers: DECISION_MAKERS,
         strategies: STRATEGIES
       };
     }
@@ -516,6 +643,11 @@
       last: root.querySelector("[data-game-last]"),
       calError: root.querySelector("[data-game-cal-error]"),
       mcError: root.querySelector("[data-game-mc-error]"),
+      decisionRegret: root.querySelector("[data-game-decision-regret]"),
+      swapRegret: root.querySelector("[data-game-swap-regret]"),
+      grantRate: root.querySelector("[data-game-grant-rate]"),
+      worstAgent: root.querySelector("[data-game-worst-agent]"),
+      decisionCount: root.querySelector("[data-game-decision-count]"),
       worstCell: root.querySelector("[data-game-worst-cell]"),
       activeBins: root.querySelector("[data-game-active-bins]"),
       behavior: root.querySelector("[data-game-behavior]"),
@@ -569,14 +701,19 @@
         `<span>${pending.context.color === "red" ? "Red" : "Blue"}</span>`,
         `<span>${pending.context.phase === "early" ? "Early" : "Late"}</span>`
       ].join("");
-      elements.groups.innerHTML = pending.activeGroups
-        .map((groupId) => `<span>${core.groupLabel(groupId)}</span>`)
+      elements.groups.innerHTML = pending.activeMakers
+        .map((maker) => `<span>${maker.label} ${formatProbability(maker.threshold)}</span>`)
         .join("");
       elements.forecast.textContent = "Locked";
       elements.expected.textContent = formatProbability(pending.expectedPrediction);
       elements.target.textContent = formatProbability(pending.target);
       elements.calError.textContent = formatProbability(metrics.calibrationError);
       elements.mcError.textContent = formatProbability(metrics.multicalibrationError);
+      elements.decisionRegret.textContent = formatProbability(metrics.maxDecisionRegret);
+      elements.swapRegret.textContent = formatProbability(metrics.maxSwapRegret);
+      elements.grantRate.textContent = `${Math.round(metrics.grantRate * 100)}%`;
+      elements.worstAgent.textContent = `Worst: ${metrics.worstDecisionAgent}`;
+      elements.decisionCount.textContent = `${metrics.decisionCount} decisions`;
       elements.worstCell.textContent = metrics.worstCellLabel === "n/a"
         ? "n/a"
         : `${metrics.worstCellLabel}: ${formatProbability(metrics.worstCell)}`;
@@ -632,7 +769,14 @@
       const plotWidth = width - padLeft - padRight;
       const plotHeight = height - padTop - padBottom;
       const maxRound = Math.max(10, metricHistory.length);
-      const maxValue = Math.max(0.5, ...metricHistory.map((item) => item.multicalibrationError));
+      const maxValue = Math.max(
+        0.5,
+        ...metricHistory.flatMap((item) => [
+          item.multicalibrationError,
+          item.maxSwapRegret,
+          item.calibrationError
+        ])
+      );
 
       context.strokeStyle = "#d9e0e8";
       context.lineWidth = 1;
@@ -650,6 +794,7 @@
 
       drawSeries("calibrationError", "#b9811f");
       drawSeries("multicalibrationError", "#0f766e");
+      drawSeries("maxSwapRegret", "#b64a4a");
 
       function drawSeries(key, color) {
         if (!metricHistory.length) {

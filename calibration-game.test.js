@@ -21,7 +21,7 @@ const strategies = [
 function run(strategyName, rounds, seed) {
   const core = new CalibrationGameCore({ rng: seededRng(seed) });
   core.runStrategy(strategyName, rounds);
-  return core.computeMetrics().multicalibrationError;
+  return core.computeMetrics();
 }
 
 function percentile(values, level) {
@@ -31,16 +31,25 @@ function percentile(values, level) {
 }
 
 function summarize(strategyName, rounds) {
-  const values = [];
+  const multicalibrationValues = [];
+  const swapValues = [];
+  const decisionValues = [];
+
   for (let seed = 1; seed <= 60; seed += 1) {
-    values.push(run(strategyName, rounds, seed));
+    const metrics = run(strategyName, rounds, seed);
+    multicalibrationValues.push(metrics.multicalibrationError);
+    swapValues.push(metrics.maxSwapRegret);
+    decisionValues.push(metrics.maxDecisionRegret);
   }
+
   return {
     strategy: strategyName,
     rounds,
-    median: percentile(values, 0.5),
-    p90: percentile(values, 0.9),
-    max: Math.max(...values)
+    mcMedian: percentile(multicalibrationValues, 0.5),
+    mcP90: percentile(multicalibrationValues, 0.9),
+    mcMax: Math.max(...multicalibrationValues),
+    swapP90: percentile(swapValues, 0.9),
+    decisionP90: percentile(decisionValues, 0.9)
   };
 }
 
@@ -53,17 +62,50 @@ for (const rounds of [10, 25, 50]) {
     summaries.push(summary);
 
     const isReactive = strategyName === "reactive";
-    const shortHorizonLimit = rounds === 10 ? 0.42 : Infinity;
-    const mediumLimit = rounds === 25 && !isReactive ? 0.28 : Infinity;
-    const mediumReactiveLimit = rounds === 25 && isReactive ? 0.42 : Infinity;
-    const longLimit = rounds === 50 && !isReactive ? 0.24 : Infinity;
-    const longReactiveLimit = rounds === 50 && isReactive ? 0.34 : Infinity;
-    const limit = Math.min(shortHorizonLimit, mediumLimit, mediumReactiveLimit, longLimit, longReactiveLimit);
+    const shortHorizonMcLimit = rounds === 10 ? 0.32 : Infinity;
+    const mediumMcLimit = rounds === 25 && !isReactive ? 0.18 : Infinity;
+    const mediumReactiveMcLimit = rounds === 25 && isReactive ? 0.24 : Infinity;
+    const longMcLimit = rounds === 50 && !isReactive ? 0.15 : Infinity;
+    const longReactiveMcLimit = rounds === 50 && isReactive ? 0.18 : Infinity;
+    const mcLimit = Math.min(
+      shortHorizonMcLimit,
+      mediumMcLimit,
+      mediumReactiveMcLimit,
+      longMcLimit,
+      longReactiveMcLimit
+    );
 
-    if (summary.p90 > limit) {
+    const shortHorizonRegretLimit = rounds === 10 ? 0.35 : Infinity;
+    const mediumRegretLimit = rounds === 25 && !isReactive ? 0.18 : Infinity;
+    const mediumReactiveRegretLimit = rounds === 25 && isReactive ? 0.32 : Infinity;
+    const longRegretLimit = rounds === 50 && !isReactive ? 0.12 : Infinity;
+    const longReactiveRegretLimit = rounds === 50 && isReactive ? 0.22 : Infinity;
+    const regretLimit = Math.min(
+      shortHorizonRegretLimit,
+      mediumRegretLimit,
+      mediumReactiveRegretLimit,
+      longRegretLimit,
+      longReactiveRegretLimit
+    );
+
+    if (summary.mcP90 > mcLimit) {
       failed = true;
       console.error(
-        `p90 multicalibration error ${summary.p90.toFixed(3)} exceeds ${limit.toFixed(3)} for ${strategyName} at ${rounds} rounds`
+        `p90 multicalibration error ${summary.mcP90.toFixed(3)} exceeds ${mcLimit.toFixed(3)} for ${strategyName} at ${rounds} rounds`
+      );
+    }
+
+    if (summary.swapP90 > regretLimit) {
+      failed = true;
+      console.error(
+        `p90 swap regret ${summary.swapP90.toFixed(3)} exceeds ${regretLimit.toFixed(3)} for ${strategyName} at ${rounds} rounds`
+      );
+    }
+
+    if (summary.decisionP90 > regretLimit) {
+      failed = true;
+      console.error(
+        `p90 decision regret ${summary.decisionP90.toFixed(3)} exceeds ${regretLimit.toFixed(3)} for ${strategyName} at ${rounds} rounds`
       );
     }
   }
@@ -72,9 +114,11 @@ for (const rounds of [10, 25, 50]) {
 console.table(summaries.map((summary) => ({
   strategy: summary.strategy,
   rounds: summary.rounds,
-  median: summary.median.toFixed(3),
-  p90: summary.p90.toFixed(3),
-  max: summary.max.toFixed(3)
+  mcMedian: summary.mcMedian.toFixed(3),
+  mcP90: summary.mcP90.toFixed(3),
+  swapP90: summary.swapP90.toFixed(3),
+  decisionP90: summary.decisionP90.toFixed(3),
+  mcMax: summary.mcMax.toFixed(3)
 })));
 
 if (failed) {

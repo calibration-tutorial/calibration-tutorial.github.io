@@ -394,7 +394,8 @@
     }
 
     .metric-value-small {
-      font-size: 1.1rem;
+      font-size: 1rem;
+      line-height: 1.25;
     }
 
     .side-metrics {
@@ -556,6 +557,10 @@
       background: var(--gold);
     }
 
+    .legend span:nth-child(3)::before {
+      background: #b64a4a;
+    }
+
     .footer {
       border-top: 1px solid var(--line);
       background: var(--panel);
@@ -688,8 +693,8 @@
       <p class="section-kicker">Interactive</p>
       <h2 id="demo-title">Multicalibration Game</h2>
       <p class="section-intro">
-        A short online game with adaptive prediction bins, a simplified no-regret
-        wrapper, and live calibration and multicalibration error.
+        A short online game with adaptive prediction bins, downstream threshold
+        decision makers, and live calibration, multicalibration, and swap-regret metrics.
       </p>
 
       <div class="demo-tool" data-calibration-game>
@@ -705,7 +710,7 @@
           <p class="metric-label">Context</p>
           <div class="context-strip" data-game-context></div>
 
-          <p class="metric-label metric-label-spaced">Active groups</p>
+          <p class="metric-label metric-label-spaced">Downstream agents</p>
           <div class="group-strip" data-game-groups></div>
 
           <div class="demo-grid">
@@ -755,17 +760,32 @@
         <aside class="demo-panel demo-panel-side" aria-label="Calibration metrics">
           <div class="demo-grid side-metrics">
             <div class="metric">
+              <p class="metric-label">Decision multicalibration</p>
+              <p class="metric-value" data-game-mc-error>0</p>
+            </div>
+            <div class="metric">
+              <p class="metric-label">Max swap regret</p>
+              <p class="metric-value" data-game-swap-regret>0</p>
+              <p class="metric-note" data-game-worst-agent>n/a</p>
+            </div>
+            <div class="metric">
               <p class="metric-label">Calibration error</p>
               <p class="metric-value" data-game-cal-error>0</p>
             </div>
             <div class="metric">
-              <p class="metric-label">Multicalibration</p>
-              <p class="metric-value" data-game-mc-error>0</p>
+              <p class="metric-label">Decision regret</p>
+              <p class="metric-value" data-game-decision-regret>0</p>
             </div>
           </div>
 
           <div class="metric metric-spaced">
-            <p class="metric-label">Worst cell</p>
+            <p class="metric-label">Grant rate</p>
+            <p class="metric-value" data-game-grant-rate>0%</p>
+            <p class="metric-note" data-game-decision-count>0 decisions</p>
+          </div>
+
+          <div class="metric metric-spaced">
+            <p class="metric-label">Worst decision group</p>
             <p class="metric-value metric-value-small" data-game-worst-cell>n/a</p>
             <p class="metric-note" data-game-active-bins>4 bins</p>
           </div>
@@ -779,6 +799,7 @@
           <div class="legend">
             <span>Multicalibration</span>
             <span>Calibration</span>
+            <span>Swap regret</span>
           </div>
         </aside>
       </div>
