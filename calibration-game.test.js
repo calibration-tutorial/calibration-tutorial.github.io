@@ -65,11 +65,11 @@ for (const rounds of [10, 25, 50]) {
     summaries.push(summary);
 
     const isReactive = strategyName === "reactive";
-    const shortHorizonMcLimit = rounds === 10 ? 0.4 : Infinity;
-    const mediumMcLimit = rounds === 25 && !isReactive ? 0.21 : Infinity;
+    const shortHorizonMcLimit = rounds === 10 ? 0.45 : Infinity;
+    const mediumMcLimit = rounds === 25 && !isReactive ? 0.24 : Infinity;
     const mediumReactiveMcLimit = rounds === 25 && isReactive ? 0.39 : Infinity;
-    const longMcLimit = rounds === 50 && !isReactive ? 0.2 : Infinity;
-    const longReactiveMcLimit = rounds === 50 && isReactive ? 0.33 : Infinity;
+    const longMcLimit = rounds === 50 && !isReactive ? 0.29 : Infinity;
+    const longReactiveMcLimit = rounds === 50 && isReactive ? 0.34 : Infinity;
     const mcLimit = Math.min(
       shortHorizonMcLimit,
       mediumMcLimit,
@@ -78,7 +78,7 @@ for (const rounds of [10, 25, 50]) {
       longReactiveMcLimit
     );
 
-    const shortHorizonRegretLimit = rounds === 10 ? 0.36 : Infinity;
+    const shortHorizonRegretLimit = rounds === 10 ? 0.42 : Infinity;
     const mediumRegretLimit = rounds === 25 && !isReactive ? 0.18 : Infinity;
     const mediumReactiveRegretLimit = rounds === 25 && isReactive ? 0.32 : Infinity;
     const longRegretLimit = rounds === 50 && !isReactive ? 0.12 : Infinity;

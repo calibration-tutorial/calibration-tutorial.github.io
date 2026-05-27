@@ -25,14 +25,26 @@
   ];
 
   const DEFAULT_OPTIONS = {
-    eta: 2.5,
+    objective: "decision",
+    eta: 10,
     slackFactor: 0.2,
     splitBase: 0.3,
     maxDepth: 4,
     startDepth: 2,
-    eviTieSlack: 0.005,
+    eviTieSlack: 0.02,
     targetDecay: 0.92,
     rng: Math.random
+  };
+
+  const OBJECTIVE_DEFAULTS = {
+    calibration: {
+      eta: 2.5,
+      eviTieSlack: 0.005
+    },
+    decision: {
+      eta: 10,
+      eviTieSlack: 0.02
+    }
   };
 
   const DECISION_MAKERS = [
@@ -127,25 +139,53 @@
 
   class CalibrationGameCore {
     constructor(options = {}) {
-      this.options = { ...DEFAULT_OPTIONS, ...options };
+      const objective = options.objective || DEFAULT_OPTIONS.objective;
+      this.options = {
+        ...DEFAULT_OPTIONS,
+        ...(OBJECTIVE_DEFAULTS[objective] || {}),
+        ...options,
+        objective
+      };
       this.rng = this.options.rng;
       this.reset();
     }
 
     reset() {
-      this.bins = [];
+      this.bins = this.initialBins();
       this.scores = new Map();
       this.groupTargets = new Map();
       this.history = [];
       this.metricHistory = [];
 
-      const count = 2 ** this.options.startDepth;
-      for (let index = 0; index < count; index += 1) {
-        this.bins.push(new Bin(index / count, (index + 1) / count, this.options.startDepth));
-      }
-
       this.pending = this.prepareRound();
       return this.getState();
+    }
+
+    initialBins() {
+      if (this.options.objective === "decision") {
+        return this.decisionPartitionBins();
+      }
+
+      const bins = [];
+      const count = 2 ** this.options.startDepth;
+      for (let index = 0; index < count; index += 1) {
+        bins.push(new Bin(index / count, (index + 1) / count, this.options.startDepth));
+      }
+
+      return bins;
+    }
+
+    decisionPartitionBins() {
+      const thresholds = Array.from(new Set(DECISION_MAKERS.map((maker) => maker.cost)))
+        .sort((left, right) => left - right);
+      const edges = [0, ...thresholds, 1];
+      const bins = [];
+
+      for (let index = 0; index < edges.length - 1; index += 1) {
+        bins.push(new Bin(edges[index], edges[index + 1], 0));
+      }
+
+      return bins;
     }
 
     contextAt(roundIndex) {
@@ -264,6 +304,13 @@
     }
 
     solveEvi(context) {
+      if (this.options.objective === "decision") {
+        return this.solveDecisionEvi(context);
+      }
+      return this.solveCalibrationEvi(context);
+    }
+
+    solveCalibrationEvi(context) {
       const target = this.targetFor(context);
       const weightedExperts = [];
       let maxLogit = -Infinity;
@@ -308,6 +355,77 @@
         };
       });
 
+      return this.selectDistribution(coefficients, target);
+    }
+
+    decisionExpertKey(groupId, makerId, swap) {
+      return `decision|${groupId}|${makerId}|${swap}`;
+    }
+
+    getDecisionScore(groupId, makerId, swap) {
+      return this.scores.get(this.decisionExpertKey(groupId, makerId, swap)) || 0;
+    }
+
+    setDecisionScore(groupId, makerId, swap, value) {
+      this.scores.set(this.decisionExpertKey(groupId, makerId, swap), Math.max(-40, Math.min(40, value)));
+    }
+
+    solveDecisionEvi(context) {
+      const target = this.targetFor(context);
+      const activeGroupIds = this.testGroupIds(context);
+      const weightedExperts = [];
+      let maxLogit = -Infinity;
+
+      for (const groupId of activeGroupIds) {
+        for (const maker of DECISION_MAKERS) {
+          for (const swap of ["bring-to-leave", "leave-to-bring"]) {
+            const logit = this.options.eta * this.getDecisionScore(groupId, maker.id, swap);
+            weightedExperts.push({ groupId, maker, swap, logit });
+            maxLogit = Math.max(maxLogit, logit);
+          }
+        }
+      }
+
+      let normalizer = 0;
+      for (const expert of weightedExperts) {
+        expert.weight = Math.exp(expert.logit - maxLogit);
+        normalizer += expert.weight;
+      }
+
+      const lambdas = new Map();
+      for (const expert of weightedExperts) {
+        lambdas.set(
+          this.decisionExpertKey(expert.groupId, expert.maker.id, expert.swap),
+          expert.weight / normalizer
+        );
+      }
+
+      const coefficients = this.bins.map((bin) => {
+        let c0 = 0;
+        let c1 = 0;
+
+        for (const groupId of activeGroupIds) {
+          for (const maker of DECISION_MAKERS) {
+            const bringWeight = lambdas.get(this.decisionExpertKey(groupId, maker.id, "bring-to-leave")) || 0;
+            const leaveWeight = lambdas.get(this.decisionExpertKey(groupId, maker.id, "leave-to-bring")) || 0;
+
+            if (bin.mid >= maker.cost) {
+              c0 += bringWeight * maker.cost;
+              c1 += bringWeight * (maker.cost - 1);
+            } else {
+              c0 -= leaveWeight * maker.cost;
+              c1 += leaveWeight * (1 - maker.cost);
+            }
+          }
+        }
+
+        return { bin, c0, c1 };
+      });
+
+      return this.selectDistribution(coefficients, target);
+    }
+
+    selectDistribution(coefficients, target) {
       const candidates = this.candidateDistributions(coefficients.length, coefficients);
       let minViolation = Infinity;
       const evaluated = candidates.map((candidate) => {
@@ -421,22 +539,11 @@
       const y = Number(outcome);
       const round = this.pending;
 
-      for (let index = 0; index < this.bins.length; index += 1) {
-        const bin = this.bins[index];
-        const probability = round.distribution[index].probability;
-        const slack = this.options.slackFactor * bin.width;
-        bin.mass += probability;
-
-        if (probability <= 0) {
-          continue;
-        }
-
-        for (const groupId of this.testGroupIds(round.context)) {
-          const plusUpdate = probability * (y - bin.mid - slack);
-          const minusUpdate = probability * (bin.mid - y - slack);
-          this.setScore(groupId, bin, "+", this.getScore(groupId, bin, "+") + plusUpdate);
-          this.setScore(groupId, bin, "-", this.getScore(groupId, bin, "-") + minusUpdate);
-        }
+      this.recordBinMass(round);
+      if (this.options.objective === "decision") {
+        this.updateDecisionScores(round, y);
+      } else {
+        this.updateCalibrationScores(round, y);
       }
 
       this.decayTargets();
@@ -460,7 +567,9 @@
       };
 
       this.history.push(record);
-      this.splitBins();
+      if (this.options.objective === "calibration") {
+        this.splitBins();
+      }
       const metrics = this.computeMetrics();
       this.metricHistory.push(metrics);
       this.pending = this.prepareRound();
@@ -470,6 +579,61 @@
         metrics,
         state: this.getState()
       };
+    }
+
+    recordBinMass(round) {
+      for (let index = 0; index < this.bins.length; index += 1) {
+        this.bins[index].mass += round.distribution[index].probability;
+      }
+    }
+
+    updateCalibrationScores(round, y) {
+      for (let index = 0; index < this.bins.length; index += 1) {
+        const bin = this.bins[index];
+        const probability = round.distribution[index].probability;
+        const slack = this.options.slackFactor * bin.width;
+
+        if (probability <= 0) {
+          continue;
+        }
+
+        for (const groupId of this.testGroupIds(round.context)) {
+          const plusUpdate = probability * (y - bin.mid - slack);
+          const minusUpdate = probability * (bin.mid - y - slack);
+          this.setScore(groupId, bin, "+", this.getScore(groupId, bin, "+") + plusUpdate);
+          this.setScore(groupId, bin, "-", this.getScore(groupId, bin, "-") + minusUpdate);
+        }
+      }
+    }
+
+    updateDecisionScores(round, y) {
+      for (const groupId of this.testGroupIds(round.context)) {
+        for (const maker of DECISION_MAKERS) {
+          let bringMass = 0;
+          let leaveMass = 0;
+
+          for (const entry of round.distribution) {
+            if (entry.midpoint >= maker.cost) {
+              bringMass += entry.probability;
+            } else {
+              leaveMass += entry.probability;
+            }
+          }
+
+          this.setDecisionScore(
+            groupId,
+            maker.id,
+            "bring-to-leave",
+            this.getDecisionScore(groupId, maker.id, "bring-to-leave") + bringMass * (maker.cost - y)
+          );
+          this.setDecisionScore(
+            groupId,
+            maker.id,
+            "leave-to-bring",
+            this.getDecisionScore(groupId, maker.id, "leave-to-bring") + leaveMass * (y - maker.cost)
+          );
+        }
+      }
     }
 
     decayTargets() {
@@ -664,11 +828,12 @@
   }
 
   function createCalibrationGame(root, options = {}) {
-    const core = new CalibrationGameCore(options);
+    let core = new CalibrationGameCore(coreOptions());
     const elements = {
       round: root.querySelector("[data-game-round]"),
       context: root.querySelector("[data-game-context]"),
       agents: root.querySelector("[data-game-agents]"),
+      agentNote: root.querySelector("[data-game-agent-note]"),
       calibrationGroups: root.querySelector("[data-game-calibration-groups]"),
       forecast: root.querySelector("[data-game-forecast]"),
       expected: root.querySelector("[data-game-expected]"),
@@ -684,6 +849,9 @@
       decisionCount: root.querySelector("[data-game-decision-count]"),
       worstCell: root.querySelector("[data-game-worst-cell]"),
       activeBins: root.querySelector("[data-game-active-bins]"),
+      treeLabel: root.querySelector("[data-game-tree-label]"),
+      algorithm: root.querySelector("[data-game-algorithm]"),
+      algorithmNote: root.querySelector("[data-game-algorithm-note]"),
       behavior: root.querySelector("[data-game-behavior]"),
       modeNote: root.querySelector("[data-game-mode-note]"),
       advanced: root.querySelector("[data-game-advanced]"),
@@ -703,6 +871,11 @@
 
     elements.behavior.addEventListener("change", render);
 
+    elements.algorithm.addEventListener("change", () => {
+      resetCore();
+      render();
+    });
+
     elements.advanced.addEventListener("toggle", render);
 
     elements.run10.addEventListener("click", () => {
@@ -714,9 +887,31 @@
     });
 
     elements.reset.addEventListener("click", () => {
-      core.reset();
+      resetCore();
       render();
     });
+
+    function selectedObjectiveOptions() {
+      return elements.algorithm.value === "calibration"
+        ? { objective: "calibration" }
+        : { objective: "decision" };
+    }
+
+    function coreOptions() {
+      const selected = root.querySelector("[data-game-algorithm]");
+      const objective = selected && selected.value === "calibration" ? "calibration" : "decision";
+      return {
+        ...options,
+        objective
+      };
+    }
+
+    function resetCore() {
+      core = new CalibrationGameCore({
+        ...options,
+        ...selectedObjectiveOptions()
+      });
+    }
 
     function runSelectedBehavior(rounds) {
       const behavior = elements.behavior.value;
@@ -733,6 +928,7 @@
       const metrics = state.metrics;
       const last = state.history[state.history.length - 1];
       const autoMode = elements.behavior.value !== "manual";
+      const decisionMode = core.options.objective === "decision";
 
       elements.round.textContent = String(pending.roundNumber);
       elements.context.innerHTML = [
@@ -743,6 +939,12 @@
         { label: "All forecasts" },
         ...state.calibrationGroups
       ].map((group) => `<span>${group.label}</span>`).join("");
+      elements.agentNote.textContent = decisionMode
+        ? "Swap regret is evaluated separately for each decision maker on its own rounds. Each has umbrella cost c and brings when p >= c; the forecaster trains on these threshold regions crossed with the context groups."
+        : "Swap regret is evaluated separately for each decision maker on its own rounds. The ECE forecaster trains on prediction bins crossed with the context groups; swap regret is measured afterward for the agents below.";
+      elements.algorithmNote.textContent = decisionMode
+        ? "Decision calibration controls bring/leave threshold regions crossed with context groups."
+        : "ECE multicalibration controls prediction-bin calibration residuals crossed with context groups.";
       renderAgents(pending.decisionMakers);
       elements.forecast.textContent = "Locked";
       elements.expected.textContent = formatProbability(pending.expectedPrediction);
@@ -756,7 +958,12 @@
       elements.worstCell.textContent = metrics.worstCellLabel === "n/a"
         ? "n/a"
         : `${metrics.worstCellLabel}: ${formatProbability(metrics.worstCell)}`;
-      elements.activeBins.textContent = `${metrics.activeBins} bins`;
+      elements.activeBins.textContent = decisionMode
+        ? `${metrics.activeBins} threshold regions`
+        : `${metrics.activeBins} bins`;
+      elements.treeLabel.textContent = decisionMode
+        ? "Decision threshold partition"
+        : "Adaptive prediction tree";
       elements.last.textContent = last
         ? `Round ${last.roundNumber}: rain forecast ${formatProbability(last.prediction)}, weather ${last.outcome ? "rain" : "dry"}`
         : "No completed rounds yet";
@@ -771,7 +978,7 @@
         : "Manual mode uses the Dry and Rain buttons one round at a time.";
 
       renderDistribution(pending.distribution);
-      renderTree(state.bins);
+      renderTree(state.bins, decisionMode);
       drawChart(elements.canvas, state.metricHistory);
     }
 
@@ -807,7 +1014,20 @@
       }).join("");
     }
 
-    function renderTree(bins) {
+    function renderTree(bins, decisionMode) {
+      if (decisionMode) {
+        elements.tree.innerHTML = `
+          <div class="tree-level" style="top: 52px;">
+            ${bins.map((bin) => `
+              <span class="tree-node is-leaf" style="left: ${bin.lo * 100}%; width: ${(bin.hi - bin.lo) * 100}%;">
+                ${formatProbability(bin.midpoint)}
+              </span>
+            `).join("")}
+          </div>
+        `;
+        return;
+      }
+
       const maxDepth = Math.max(...bins.map((bin) => bin.depth), 0);
       const leafKeys = new Set(bins.map((bin) => `${bin.depth}:${bin.lo.toFixed(5)}`));
       const levels = [];
@@ -921,6 +1141,7 @@
       const state = core.getState();
       const pending = state.pending;
       return JSON.stringify({
+        objective: core.options.objective,
         round: pending.roundNumber,
         context: pending.context,
         activeCalibrationGroups: pending.activeCalibrationGroups.map((group) => group.label),

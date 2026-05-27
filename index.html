@@ -833,9 +833,11 @@
           <div class="context-strip" data-game-context></div>
 
           <p class="metric-label metric-label-spaced">Swap-regret agents</p>
-          <p class="metric-note">
+          <p class="metric-note" data-game-agent-note>
             Swap regret is evaluated separately for each decision maker on its
-            own rounds. Each has umbrella cost c and brings when p >= c.
+            own rounds. Each has umbrella cost c and brings when p >= c; the
+            forecaster trains on these threshold regions crossed with the
+            context groups.
           </p>
           <div class="agent-list" data-game-agents></div>
 
@@ -860,6 +862,15 @@
           <div class="outcome-controls" aria-label="Choose weather outcome">
             <button class="outcome-button" type="button" data-game-outcome="0">Dry</button>
             <button class="outcome-button" type="button" data-game-outcome="1">Rain</button>
+          </div>
+
+          <div class="control-row">
+            <label for="game-algorithm">Forecaster</label>
+            <select id="game-algorithm" data-game-algorithm>
+              <option value="decision" selected>Decision calibration</option>
+              <option value="calibration">ECE multicalibration</option>
+            </select>
+            <p class="metric-note" data-game-algorithm-note></p>
           </div>
 
           <div class="control-row">
@@ -923,7 +934,7 @@
                 <p class="metric-note" data-game-active-bins>4 bins</p>
               </div>
 
-              <p class="metric-label metric-label-spaced">Adaptive prediction tree</p>
+              <p class="metric-label metric-label-spaced" data-game-tree-label>Decision threshold partition</p>
               <div class="tree-wrap" data-game-tree></div>
 
               <p class="metric-label metric-label-spaced">Current mixed forecast</p>
