@@ -426,13 +426,42 @@
       line-height: 1.25;
     }
 
+    .primary-metric {
+      min-height: 154px;
+      padding: 18px;
+      background: var(--soft);
+      border-color: #acc7c2;
+    }
+
+    .primary-metric .metric-value {
+      font-size: clamp(3rem, 8vw, 4.7rem);
+    }
+
     .side-metrics {
       grid-template-columns: 1fr 1fr;
     }
 
-    .side-metrics .metric:first-child {
-      grid-column: 1 / -1;
-      min-height: 84px;
+    .advanced-panel {
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfd;
+      overflow: hidden;
+    }
+
+    .advanced-panel summary {
+      min-height: 44px;
+      padding: 11px 14px;
+      color: var(--ink);
+      font-size: 0.9rem;
+      font-weight: 800;
+      cursor: pointer;
+      list-style-position: inside;
+    }
+
+    .advanced-body {
+      padding: 0 14px 14px;
+      border-top: 1px solid var(--line);
     }
 
     .outcome-controls {
@@ -861,7 +890,7 @@
           </div>
 
           <div class="control-row">
-            <label for="game-behavior">Automated behavior</label>
+            <label for="game-behavior">Weather pattern</label>
             <select id="game-behavior" data-game-behavior>
               <option value="manual">Manual</option>
               <option value="always-zero">Always dry</option>
@@ -882,48 +911,54 @@
         </section>
 
         <aside class="demo-panel demo-panel-side" aria-label="Calibration metrics">
-          <div class="demo-grid side-metrics">
-            <div class="metric">
-              <p class="metric-label">Context multicalibration</p>
-              <p class="metric-value" data-game-mc-error>0</p>
+          <div class="metric primary-metric">
+            <p class="metric-label">Max swap regret</p>
+            <p class="metric-value" data-game-swap-regret>0</p>
+            <p class="metric-note" data-game-worst-agent>Worst: n/a</p>
+          </div>
+
+          <details class="advanced-panel" data-game-advanced>
+            <summary>Advanced diagnostics</summary>
+            <div class="advanced-body">
+              <div class="demo-grid side-metrics">
+                <div class="metric">
+                  <p class="metric-label">Context multicalibration</p>
+                  <p class="metric-value" data-game-mc-error>0</p>
+                </div>
+                <div class="metric">
+                  <p class="metric-label">Calibration error</p>
+                  <p class="metric-value" data-game-cal-error>0</p>
+                </div>
+              </div>
+
+              <div class="metric metric-spaced">
+                <p class="metric-label">Umbrella rate</p>
+                <p class="metric-value" data-game-umbrella-rate>0%</p>
+                <p class="metric-note" data-game-decision-count>0 decisions</p>
+              </div>
+
+              <div class="metric metric-spaced">
+                <p class="metric-label">Worst calibration cell</p>
+                <p class="metric-value metric-value-small" data-game-worst-cell>n/a</p>
+                <p class="metric-note" data-game-active-bins>4 bins</p>
+              </div>
+
+              <p class="metric-label metric-label-spaced">Adaptive prediction tree</p>
+              <div class="tree-wrap" data-game-tree></div>
+
+              <p class="metric-label metric-label-spaced">Current mixed forecast</p>
+              <div class="distribution" data-game-distribution></div>
+
+              <div class="chart-wrap">
+                <canvas data-game-chart aria-label="Calibration error over time"></canvas>
+              </div>
+              <div class="legend">
+                <span>Context multicalibration</span>
+                <span>Calibration</span>
+                <span>Swap regret</span>
+              </div>
             </div>
-            <div class="metric">
-              <p class="metric-label">Max swap regret</p>
-              <p class="metric-value" data-game-swap-regret>0</p>
-              <p class="metric-note" data-game-worst-agent>n/a</p>
-            </div>
-            <div class="metric">
-              <p class="metric-label">Calibration error</p>
-              <p class="metric-value" data-game-cal-error>0</p>
-            </div>
-          </div>
-
-          <div class="metric metric-spaced">
-            <p class="metric-label">Umbrella rate</p>
-            <p class="metric-value" data-game-umbrella-rate>0%</p>
-            <p class="metric-note" data-game-decision-count>0 decisions</p>
-          </div>
-
-          <div class="metric metric-spaced">
-            <p class="metric-label">Worst calibration cell</p>
-            <p class="metric-value metric-value-small" data-game-worst-cell>n/a</p>
-            <p class="metric-note" data-game-active-bins>4 bins</p>
-          </div>
-
-          <p class="metric-label metric-label-spaced">Adaptive prediction tree</p>
-          <div class="tree-wrap" data-game-tree></div>
-
-          <p class="metric-label metric-label-spaced">Current mixed forecast</p>
-          <div class="distribution" data-game-distribution></div>
-
-          <div class="chart-wrap">
-            <canvas data-game-chart aria-label="Calibration error over time"></canvas>
-          </div>
-          <div class="legend">
-            <span>Context multicalibration</span>
-            <span>Calibration</span>
-            <span>Swap regret</span>
-          </div>
+          </details>
         </aside>
       </div>
     </section>

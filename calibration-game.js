@@ -690,6 +690,7 @@
       worstCell: root.querySelector("[data-game-worst-cell]"),
       activeBins: root.querySelector("[data-game-active-bins]"),
       behavior: root.querySelector("[data-game-behavior]"),
+      advanced: root.querySelector("[data-game-advanced]"),
       run10: root.querySelector("[data-game-run='10']"),
       run50: root.querySelector("[data-game-run='50']"),
       reset: root.querySelector("[data-game-reset]"),
@@ -705,6 +706,8 @@
     });
 
     elements.behavior.addEventListener("change", render);
+
+    elements.advanced.addEventListener("toggle", render);
 
     elements.calibrationToggles.forEach((input) => {
       input.addEventListener("change", () => {
