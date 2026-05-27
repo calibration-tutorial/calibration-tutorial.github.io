@@ -454,6 +454,25 @@
       font-size: clamp(3rem, 8vw, 4.7rem);
     }
 
+    .headline-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .headline-metrics .primary-metric {
+      min-height: 148px;
+    }
+
+    .headline-metrics .metric-value {
+      font-size: clamp(2.25rem, 5vw, 3.4rem);
+    }
+
+    .ece-metric {
+      background: #fff8e8;
+      border-color: #d8b56f;
+    }
+
     .side-metrics {
       grid-template-columns: 1fr 1fr;
     }
@@ -743,6 +762,7 @@
         grid-template-columns: 1fr;
       }
 
+      .headline-metrics,
       .auto-controls,
       .outcome-controls {
         grid-template-columns: 1fr;
@@ -896,24 +916,25 @@
         </section>
 
         <aside class="demo-panel demo-panel-side" aria-label="Calibration metrics">
-          <div class="metric primary-metric">
-            <p class="metric-label">Max swap regret</p>
-            <p class="metric-value" data-game-swap-regret>0</p>
-            <p class="metric-note" data-game-worst-agent>Worst agent: n/a</p>
+          <div class="headline-metrics">
+            <div class="metric primary-metric">
+              <p class="metric-label">Max swap regret</p>
+              <p class="metric-value" data-game-swap-regret>0</p>
+              <p class="metric-note" data-game-worst-agent>Worst agent: n/a</p>
+            </div>
+            <div class="metric primary-metric ece-metric">
+              <p class="metric-label">ECE</p>
+              <p class="metric-value" data-game-cal-error>0</p>
+              <p class="metric-note">Overall calibration error</p>
+            </div>
           </div>
 
           <details class="advanced-panel" data-game-advanced>
             <summary>Advanced diagnostics</summary>
             <div class="advanced-body">
-              <div class="demo-grid side-metrics">
-                <div class="metric">
-                  <p class="metric-label">Context multicalibration</p>
-                  <p class="metric-value" data-game-mc-error>0</p>
-                </div>
-                <div class="metric">
-                  <p class="metric-label">Calibration error</p>
-                  <p class="metric-value" data-game-cal-error>0</p>
-                </div>
+              <div class="metric metric-spaced">
+                <p class="metric-label">Context multicalibration</p>
+                <p class="metric-value" data-game-mc-error>0</p>
               </div>
 
               <div class="metric metric-spaced">
