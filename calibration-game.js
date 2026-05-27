@@ -685,6 +685,7 @@
       worstCell: root.querySelector("[data-game-worst-cell]"),
       activeBins: root.querySelector("[data-game-active-bins]"),
       behavior: root.querySelector("[data-game-behavior]"),
+      modeNote: root.querySelector("[data-game-mode-note]"),
       advanced: root.querySelector("[data-game-advanced]"),
       run10: root.querySelector("[data-game-run='10']"),
       run50: root.querySelector("[data-game-run='50']"),
@@ -765,6 +766,9 @@
       });
       elements.run10.disabled = !autoMode;
       elements.run50.disabled = !autoMode;
+      elements.modeNote.textContent = autoMode
+        ? "Run buttons advance the selected automated weather pattern."
+        : "Manual mode uses the Dry and Rain buttons one round at a time.";
 
       renderDistribution(pending.distribution);
       renderTree(state.bins);

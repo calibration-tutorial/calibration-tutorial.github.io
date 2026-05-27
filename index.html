@@ -868,17 +868,18 @@
               <option value="manual">Manual</option>
               <option value="always-zero">Always dry</option>
               <option value="always-one">Always rain</option>
-              <option value="red-blue">Coast rain, inland dry</option>
+              <option value="red-blue" selected>Coast rain, inland dry</option>
               <option value="early-late">Morning rain, evening dry</option>
               <option value="alternating">Alternating</option>
               <option value="shift">Storm at round 25</option>
               <option value="reactive">React to last forecast</option>
             </select>
+            <p class="metric-note" data-game-mode-note></p>
           </div>
 
           <div class="auto-controls">
-            <button class="demo-button secondary" type="button" data-game-run="10" disabled>Run 10</button>
-            <button class="demo-button secondary" type="button" data-game-run="50" disabled>Run 50</button>
+            <button class="demo-button secondary" type="button" data-game-run="10">Run 10</button>
+            <button class="demo-button secondary" type="button" data-game-run="50">Run 50</button>
           </div>
           <button class="demo-button secondary reset-button" type="button" data-game-reset>Reset</button>
         </section>
