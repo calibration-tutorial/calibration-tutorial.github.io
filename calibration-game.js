@@ -563,16 +563,12 @@
             maker,
             count: 0,
             brings: 0,
-            utility: 0,
-            fixedBringUtility: 0,
             bringToLeaveImprovement: 0,
             leaveToBringImprovement: 0
           };
 
           stats.count += 1;
           stats.brings += action === "bring" ? 1 : 0;
-          stats.utility += chosenUtility;
-          stats.fixedBringUtility += bringUtility;
 
           if (action === "bring") {
             stats.bringToLeaveImprovement += 0 - chosenUtility;
@@ -614,22 +610,15 @@
         }
       }
 
-      let maxDecisionRegret = 0;
       let maxSwapRegret = 0;
       let worstDecisionAgent = "n/a";
 
       for (const stats of makerStats.values()) {
         const denominator = Math.max(1, stats.count);
-        const bestFixedUtility = Math.max(0, stats.fixedBringUtility);
-        const decisionRegret = Math.max(0, bestFixedUtility - stats.utility) / denominator;
         const swapRegret = (
           Math.max(0, stats.bringToLeaveImprovement) +
           Math.max(0, stats.leaveToBringImprovement)
         ) / denominator;
-
-        if (decisionRegret > maxDecisionRegret) {
-          maxDecisionRegret = decisionRegret;
-        }
 
         if (swapRegret > maxSwapRegret) {
           maxSwapRegret = swapRegret;
@@ -641,7 +630,6 @@
         round: this.history.length,
         calibrationError,
         multicalibrationError,
-        maxDecisionRegret,
         maxSwapRegret,
         umbrellaRate: decisionCount ? umbrellaCount / decisionCount : 0,
         worstCell,
@@ -695,7 +683,6 @@
       last: root.querySelector("[data-game-last]"),
       calError: root.querySelector("[data-game-cal-error]"),
       mcError: root.querySelector("[data-game-mc-error]"),
-      decisionRegret: root.querySelector("[data-game-decision-regret]"),
       swapRegret: root.querySelector("[data-game-swap-regret]"),
       umbrellaRate: root.querySelector("[data-game-umbrella-rate]"),
       worstAgent: root.querySelector("[data-game-worst-agent]"),
@@ -782,7 +769,6 @@
       elements.target.textContent = formatProbability(pending.target);
       elements.calError.textContent = formatProbability(metrics.calibrationError);
       elements.mcError.textContent = formatProbability(metrics.multicalibrationError);
-      elements.decisionRegret.textContent = formatProbability(metrics.maxDecisionRegret);
       elements.swapRegret.textContent = formatProbability(metrics.maxSwapRegret);
       elements.umbrellaRate.textContent = `${Math.round(metrics.umbrellaRate * 100)}%`;
       elements.worstAgent.textContent = `Worst: ${metrics.worstDecisionAgent}`;

@@ -47,14 +47,12 @@ function percentile(values, level) {
 function summarize(strategyName, rounds, mode) {
   const multicalibrationValues = [];
   const swapValues = [];
-  const decisionValues = [];
   const calibrationValues = [];
 
   for (let seed = 1; seed <= 60; seed += 1) {
     const metrics = run(strategyName, rounds, seed, mode);
     multicalibrationValues.push(metrics.multicalibrationError);
     swapValues.push(metrics.maxSwapRegret);
-    decisionValues.push(metrics.maxDecisionRegret);
     calibrationValues.push(metrics.calibrationError);
   }
 
@@ -67,8 +65,7 @@ function summarize(strategyName, rounds, mode) {
     mcP90: percentile(multicalibrationValues, 0.9),
     mcMax: Math.max(...multicalibrationValues),
     calP90: percentile(calibrationValues, 0.9),
-    swapP90: percentile(swapValues, 0.9),
-    decisionP90: percentile(decisionValues, 0.9)
+    swapP90: percentile(swapValues, 0.9)
   };
 }
 
@@ -125,12 +122,6 @@ for (const mode of modes) {
         );
       }
 
-      if (summary.decisionP90 > regretLimit) {
-        failed = true;
-        console.error(
-          `p90 decision regret ${summary.decisionP90.toFixed(3)} exceeds ${regretLimit.toFixed(3)} for ${mode.name} ${strategyName} at ${rounds} rounds`
-        );
-      }
     }
   }
 }
@@ -154,7 +145,6 @@ console.table(summaries.map((summary) => ({
   mcMedian: summary.mcMedian.toFixed(3),
   mcP90: summary.mcP90.toFixed(3),
   swapP90: summary.swapP90.toFixed(3),
-  decisionP90: summary.decisionP90.toFixed(3),
   mcMax: summary.mcMax.toFixed(3)
 })));
 

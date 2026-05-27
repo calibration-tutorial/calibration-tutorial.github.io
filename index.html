@@ -430,6 +430,11 @@
       grid-template-columns: 1fr 1fr;
     }
 
+    .side-metrics .metric:first-child {
+      grid-column: 1 / -1;
+      min-height: 84px;
+    }
+
     .outcome-controls {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -890,10 +895,6 @@
             <div class="metric">
               <p class="metric-label">Calibration error</p>
               <p class="metric-value" data-game-cal-error>0</p>
-            </div>
-            <div class="metric">
-              <p class="metric-label">Decision regret</p>
-              <p class="metric-value" data-game-decision-regret>0</p>
             </div>
           </div>
 
