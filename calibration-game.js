@@ -24,8 +24,6 @@
     }
   ];
 
-  const DEFAULT_ENABLED_CALIBRATION_GROUPS = CALIBRATION_GROUPS.map((group) => group.id);
-
   const DEFAULT_OPTIONS = {
     eta: 2.5,
     slackFactor: 0.2,
@@ -34,7 +32,6 @@
     startDepth: 2,
     eviTieSlack: 0.005,
     targetDecay: 0.92,
-    enabledCalibrationGroups: DEFAULT_ENABLED_CALIBRATION_GROUPS,
     rng: Math.random
   };
 
@@ -42,30 +39,35 @@
     {
       id: "general",
       label: "Everyday commuter",
+      scope: "All rounds",
       cost: 0.5,
       applies: () => true
     },
     {
       id: "coast",
       label: "Coastal walker",
+      scope: "Coast rounds",
       cost: 0.35,
       applies: (context) => context.region === "coast"
     },
     {
       id: "inland",
       label: "Inland minimalist",
+      scope: "Inland rounds",
       cost: 0.65,
       applies: (context) => context.region === "inland"
     },
     {
       id: "morning",
       label: "Morning cyclist",
+      scope: "Morning rounds",
       cost: 0.45,
       applies: (context) => context.period === "morning"
     },
     {
       id: "evening",
       label: "Evening hiker",
+      scope: "Evening rounds",
       cost: 0.55,
       applies: (context) => context.period === "evening"
     }
@@ -126,22 +128,8 @@
   class CalibrationGameCore {
     constructor(options = {}) {
       this.options = { ...DEFAULT_OPTIONS, ...options };
-      this.options.enabledCalibrationGroups = this.normalizeCalibrationGroups(
-        this.options.enabledCalibrationGroups
-      );
       this.rng = this.options.rng;
       this.reset();
-    }
-
-    normalizeCalibrationGroups(groupIds) {
-      const valid = new Set(CALIBRATION_GROUPS.map((group) => group.id));
-      return Array.from(new Set(groupIds || DEFAULT_ENABLED_CALIBRATION_GROUPS))
-        .filter((groupId) => valid.has(groupId));
-    }
-
-    setEnabledCalibrationGroups(groupIds) {
-      this.options.enabledCalibrationGroups = this.normalizeCalibrationGroups(groupIds);
-      return this.reset();
     }
 
     reset() {
@@ -171,13 +159,8 @@
       return DECISION_MAKERS.filter((maker) => maker.applies(context));
     }
 
-    enabledCalibrationGroupSet() {
-      return new Set(this.options.enabledCalibrationGroups || DEFAULT_ENABLED_CALIBRATION_GROUPS);
-    }
-
     activeCalibrationGroups(context) {
-      const enabled = this.enabledCalibrationGroupSet();
-      return CALIBRATION_GROUPS.filter((group) => enabled.has(group.id) && group.applies(context));
+      return CALIBRATION_GROUPS.filter((group) => group.applies(context));
     }
 
     calibrationGroupIds(context) {
@@ -251,13 +234,20 @@
         activeMakers: this.activeDecisionMakers(context).map((maker) => ({
           id: maker.id,
           label: maker.label,
+          scope: maker.scope,
           cost: maker.cost
+        })),
+        decisionMakers: DECISION_MAKERS.map((maker) => ({
+          id: maker.id,
+          label: maker.label,
+          scope: maker.scope,
+          cost: maker.cost,
+          active: maker.applies(context)
         })),
         activeCalibrationGroups: this.activeCalibrationGroups(context).map((group) => ({
           id: group.id,
           label: group.label
         })),
-        enabledCalibrationGroups: this.options.enabledCalibrationGroups.slice(),
         sampledIndex,
         prediction: this.bins[sampledIndex].mid,
         distribution: solution.probs.map((probability, index) => ({
@@ -654,9 +644,16 @@
           depth: bin.depth,
           mass: bin.mass
         })),
-        decisionMakers: DECISION_MAKERS,
-        calibrationGroups: CALIBRATION_GROUPS,
-        enabledCalibrationGroups: this.options.enabledCalibrationGroups.slice(),
+        decisionMakers: DECISION_MAKERS.map((maker) => ({
+          id: maker.id,
+          label: maker.label,
+          scope: maker.scope,
+          cost: maker.cost
+        })),
+        calibrationGroups: CALIBRATION_GROUPS.map((group) => ({
+          id: group.id,
+          label: group.label
+        })),
         strategies: STRATEGIES
       };
     }
@@ -671,13 +668,11 @@
     const elements = {
       round: root.querySelector("[data-game-round]"),
       context: root.querySelector("[data-game-context]"),
-      groups: root.querySelector("[data-game-groups]"),
+      agents: root.querySelector("[data-game-agents]"),
       calibrationGroups: root.querySelector("[data-game-calibration-groups]"),
-      calibrationToggles: Array.from(root.querySelectorAll("[data-game-calibration-group]")),
       forecast: root.querySelector("[data-game-forecast]"),
       expected: root.querySelector("[data-game-expected]"),
       target: root.querySelector("[data-game-target]"),
-      utility: root.querySelector("[data-game-utility]"),
       distribution: root.querySelector("[data-game-distribution]"),
       tree: root.querySelector("[data-game-tree]"),
       last: root.querySelector("[data-game-last]"),
@@ -709,13 +704,6 @@
 
     elements.advanced.addEventListener("toggle", render);
 
-    elements.calibrationToggles.forEach((input) => {
-      input.addEventListener("change", () => {
-        core.setEnabledCalibrationGroups(selectedCalibrationGroups());
-        render();
-      });
-    });
-
     elements.run10.addEventListener("click", () => {
       runSelectedBehavior(10);
     });
@@ -738,12 +726,6 @@
       render();
     }
 
-    function selectedCalibrationGroups() {
-      return elements.calibrationToggles
-        .filter((input) => input.checked)
-        .map((input) => input.dataset.gameCalibrationGroup);
-    }
-
     function render() {
       const state = core.getState();
       const pending = state.pending;
@@ -756,17 +738,11 @@
         `<span>${pending.context.region === "coast" ? "Coast" : "Inland"}</span>`,
         `<span>${pending.context.period === "morning" ? "Morning" : "Evening"}</span>`
       ].join("");
-      elements.calibrationToggles.forEach((input) => {
-        input.checked = state.enabledCalibrationGroups.includes(input.dataset.gameCalibrationGroup);
-      });
       elements.calibrationGroups.innerHTML = [
         { label: "All forecasts" },
-        ...pending.activeCalibrationGroups
+        ...state.calibrationGroups
       ].map((group) => `<span>${group.label}</span>`).join("");
-      elements.groups.innerHTML = pending.activeMakers
-        .map((maker) => `<span>${maker.label} c=${formatProbability(maker.cost)}</span>`)
-        .join("");
-      renderUtility(pending.activeMakers);
+      renderAgents(pending.decisionMakers);
       elements.forecast.textContent = "Locked";
       elements.expected.textContent = formatProbability(pending.expectedPrediction);
       elements.target.textContent = formatProbability(pending.target);
@@ -774,7 +750,7 @@
       elements.mcError.textContent = formatProbability(metrics.multicalibrationError);
       elements.swapRegret.textContent = formatProbability(metrics.maxSwapRegret);
       elements.umbrellaRate.textContent = `${Math.round(metrics.umbrellaRate * 100)}%`;
-      elements.worstAgent.textContent = `Worst: ${metrics.worstDecisionAgent}`;
+      elements.worstAgent.textContent = `Worst agent: ${metrics.worstDecisionAgent}`;
       elements.decisionCount.textContent = `${metrics.decisionCount} decisions`;
       elements.worstCell.textContent = metrics.worstCellLabel === "n/a"
         ? "n/a"
@@ -795,14 +771,22 @@
       drawChart(elements.canvas, state.metricHistory);
     }
 
-    function renderUtility(activeMakers) {
-      elements.utility.innerHTML = activeMakers.map((maker) => `
-        <div class="utility-row">
-          <span>${maker.label}</span>
-          <span>c=${formatProbability(maker.cost)}</span>
+    function renderAgents(decisionMakers) {
+      const header = `
+        <div class="agent-row agent-head">
+          <span>Agent</span>
+          <span>Rounds</span>
+          <span>Best response</span>
+        </div>
+      `;
+      const rows = decisionMakers.map((maker) => `
+        <div class="agent-row${maker.active ? "" : " is-inactive"}">
+          <span class="agent-name">${maker.label}${maker.active ? '<span class="agent-active">active</span>' : ""}</span>
+          <span>${maker.scope}</span>
           <span>bring if p >= ${formatProbability(maker.cost)}</span>
         </div>
       `).join("");
+      elements.agents.innerHTML = header + rows;
     }
 
     function renderDistribution(distribution) {
@@ -935,9 +919,10 @@
       return JSON.stringify({
         round: pending.roundNumber,
         context: pending.context,
-        enabledCalibrationGroups: state.enabledCalibrationGroups,
         activeCalibrationGroups: pending.activeCalibrationGroups.map((group) => group.label),
-        activeDecisionMakers: pending.activeMakers.map((maker) => maker.label),
+        activeDecisionMakers: pending.decisionMakers
+          .filter((maker) => maker.active)
+          .map((maker) => maker.label),
         expectedPrediction: pending.expectedPrediction,
         target: pending.target,
         metrics: state.metrics

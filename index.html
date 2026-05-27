@@ -349,31 +349,48 @@
       background: #eef8f6;
     }
 
-    .toggle-grid {
+    .agent-list {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
       margin-top: 10px;
-    }
-
-    .toggle-chip {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      min-height: 36px;
-      padding: 6px 10px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #fbfcfd;
       color: var(--ink);
-      font-size: 0.9rem;
-      font-weight: 750;
+      font-size: 0.86rem;
     }
 
-    .toggle-chip input {
-      width: 16px;
-      height: 16px;
-      accent-color: var(--accent);
+    .agent-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(92px, 0.7fr) minmax(130px, 0.9fr);
+      align-items: center;
+      min-height: 32px;
+      gap: 8px;
+      padding: 5px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .agent-row.is-inactive {
+      opacity: 0.55;
+    }
+
+    .agent-head {
+      min-height: 26px;
+      color: var(--muted);
+      font-size: 0.74rem;
+      font-weight: 850;
+      text-transform: uppercase;
+    }
+
+    .agent-name {
+      font-weight: 800;
+    }
+
+    .agent-active {
+      display: inline-flex;
+      margin-left: 6px;
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: var(--soft);
+      color: var(--accent-strong);
+      font-size: 0.72rem;
+      font-weight: 850;
     }
 
     .demo-grid {
@@ -542,27 +559,6 @@
       color: var(--ink);
       font: inherit;
       font-weight: 650;
-    }
-
-    .utility-list {
-      display: grid;
-      gap: 6px;
-      margin-top: 10px;
-      color: var(--ink);
-      font-size: 0.86rem;
-    }
-
-    .utility-row {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto auto;
-      gap: 8px;
-      align-items: center;
-      min-height: 28px;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .utility-row span:first-child {
-      font-weight: 750;
     }
 
     .distribution {
@@ -748,12 +744,11 @@
       }
 
       .auto-controls,
-      .outcome-controls,
-      .toggle-grid {
+      .outcome-controls {
         grid-template-columns: 1fr;
       }
 
-      .utility-row {
+      .agent-row {
         grid-template-columns: 1fr;
         gap: 2px;
         padding-bottom: 6px;
@@ -820,8 +815,8 @@
       <p class="section-kicker">Interactive</p>
       <h2 id="demo-title">Rain Forecasting Game</h2>
       <p class="section-intro">
-        A short online game about forecasting rain, umbrella decisions, toggleable
-        context groups, adaptive prediction bins, and live calibration and swap-regret metrics.
+        A short online game about forecasting rain, umbrella decisions, adaptive
+        prediction bins, and live calibration and swap-regret metrics.
       </p>
 
       <div class="demo-tool" data-calibration-game>
@@ -837,34 +832,12 @@
           <p class="metric-label">Weather setting</p>
           <div class="context-strip" data-game-context></div>
 
-          <p class="metric-label metric-label-spaced">Calibration groups</p>
-          <div class="toggle-grid" data-game-calibration-toggles>
-            <label class="toggle-chip">
-              <input type="checkbox" data-game-calibration-group="coast" checked>
-              Coast days
-            </label>
-            <label class="toggle-chip">
-              <input type="checkbox" data-game-calibration-group="inland" checked>
-              Inland days
-            </label>
-            <label class="toggle-chip">
-              <input type="checkbox" data-game-calibration-group="morning" checked>
-              Morning rounds
-            </label>
-            <label class="toggle-chip">
-              <input type="checkbox" data-game-calibration-group="evening" checked>
-              Evening rounds
-            </label>
-          </div>
-          <p class="metric-note">Overall calibration is always included; changing groups resets the run.</p>
-          <div class="group-strip" data-game-calibration-groups></div>
-
-          <p class="metric-label metric-label-spaced">Umbrella agents</p>
-          <div class="group-strip" data-game-groups></div>
-
-          <p class="metric-label metric-label-spaced">Utility</p>
-          <p class="metric-note">Bring umbrella: rain gives 1-c, dry gives -c; leave umbrella gives 0.</p>
-          <div class="utility-list" data-game-utility></div>
+          <p class="metric-label metric-label-spaced">Swap-regret agents</p>
+          <p class="metric-note">
+            Swap regret is evaluated separately for each decision maker on its
+            own rounds. Each has umbrella cost c and brings when p >= c.
+          </p>
+          <div class="agent-list" data-game-agents></div>
 
           <div class="demo-grid">
             <div class="metric">
@@ -914,7 +887,7 @@
           <div class="metric primary-metric">
             <p class="metric-label">Max swap regret</p>
             <p class="metric-value" data-game-swap-regret>0</p>
-            <p class="metric-note" data-game-worst-agent>Worst: n/a</p>
+            <p class="metric-note" data-game-worst-agent>Worst agent: n/a</p>
           </div>
 
           <details class="advanced-panel" data-game-advanced>
@@ -929,6 +902,12 @@
                   <p class="metric-label">Calibration error</p>
                   <p class="metric-value" data-game-cal-error>0</p>
                 </div>
+              </div>
+
+              <div class="metric metric-spaced">
+                <p class="metric-label">Calibration groups included</p>
+                <p class="metric-note">Fixed for every run: overall plus all context groups.</p>
+                <div class="group-strip" data-game-calibration-groups></div>
               </div>
 
               <div class="metric metric-spaced">
