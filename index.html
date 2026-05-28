@@ -425,6 +425,31 @@
       padding-bottom: 12px;
     }
 
+    .pattern-details {
+      margin-top: 14px;
+    }
+
+    .pattern-list {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .pattern-list li {
+      display: grid;
+      gap: 2px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
+    .pattern-list strong {
+      color: var(--ink);
+      font-weight: 850;
+    }
+
     .demo-grid {
       display: grid;
       grid-template-columns: minmax(0, 1fr);
@@ -928,6 +953,23 @@
               <p class="metric-note" data-game-mode-note></p>
             </div>
           </div>
+
+          <details class="inline-details pattern-details">
+            <summary>Weather pattern guide</summary>
+            <div class="inline-details-body">
+              <ul class="pattern-list">
+                <li><strong>Manual</strong> Choose rain or dry yourself each day.</li>
+                <li><strong>Always dry</strong> The outcome is dry every day.</li>
+                <li><strong>Always rain</strong> The outcome is rain every day.</li>
+                <li><strong>Coast rain, inland dry</strong> Coastal contexts get rain; inland contexts stay dry.</li>
+                <li><strong>Morning rain, evening dry</strong> Morning contexts get rain; evening contexts stay dry.</li>
+                <li><strong>Alternating</strong> Weather alternates day by day, starting with rain.</li>
+                <li><strong>Storm at round 25</strong> The first 25 days are dry; later days are rainy.</li>
+                <li><strong>React to last forecast</strong> The first day is dry; later days are rainy if the previous sampled forecast was below 55%.</li>
+                <li><strong>Contrarian</strong> It rains when the current expected forecast is at most 50%, and is dry otherwise.</li>
+              </ul>
+            </div>
+          </details>
 
           <div class="outcome-controls" data-game-manual-controls hidden aria-label="Choose weather outcome">
             <button class="outcome-button" type="button" data-game-outcome="0">Dry</button>
