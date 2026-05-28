@@ -190,8 +190,8 @@
 
     contextAt(roundIndex) {
       return {
-        region: roundIndex % 2 === 0 ? "coast" : "inland",
-        period: Math.floor(roundIndex / 5) % 2 === 0 ? "morning" : "evening"
+        region: Math.floor(roundIndex / 2) % 2 === 0 ? "coast" : "inland",
+        period: roundIndex % 2 === 0 ? "morning" : "evening"
       };
     }
 
@@ -866,6 +866,8 @@
       behavior: root.querySelector("[data-game-behavior]"),
       modeNote: root.querySelector("[data-game-mode-note]"),
       advanced: root.querySelector("[data-game-advanced]"),
+      autoControls: root.querySelector("[data-game-auto-controls]"),
+      manualControls: root.querySelector("[data-game-manual-controls]"),
       runButtons: Array.from(root.querySelectorAll("[data-game-run]")),
       reset: root.querySelector("[data-game-reset]"),
       outcomes: Array.from(root.querySelectorAll("[data-game-outcome]")),
@@ -947,8 +949,8 @@
       const morningCount = records.filter((record) => record.context.period === "morning").length;
       const rainCount = records.filter((record) => record.outcome === 1).length;
       const range = first.roundNumber === lastRecord.roundNumber
-        ? `round ${first.roundNumber}`
-        : `rounds ${first.roundNumber}-${lastRecord.roundNumber}`;
+        ? `day ${first.roundNumber}`
+        : `days ${first.roundNumber}-${lastRecord.roundNumber}`;
 
       return `Last run: ${range}; ${coastCount} coast/${records.length - coastCount} inland, ` +
         `${morningCount} morning/${records.length - morningCount} evening, ${rainCount} rain.`;
@@ -969,26 +971,24 @@
         `<span>${periodLabel}</span>`
       ].join("");
       elements.contextNote.textContent = autoMode
-        ? "This is the next round only. Next round steps once; Run 10 and Run 50 jump through full context cycles, so they can end on the same next context."
-        : "This is the context for the next manual round.";
+        ? "This is the next simulated day. Batches advance many days; the forecast card summarizes the last run."
+        : "This is the context for the day you are choosing.";
       elements.calibrationGroups.innerHTML = [
         { label: "All forecasts" },
         ...state.calibrationGroups
       ].map((group) => `<span>${group.label}</span>`).join("");
-      elements.agentNote.textContent = decisionMode
-        ? "Swap regret is evaluated separately for each decision maker on its own rounds. Each has umbrella cost c and brings when p >= c; the forecaster trains on these threshold regions crossed with the context groups."
-        : "Swap regret is evaluated separately for each decision maker on its own rounds. The ECE forecaster trains on prediction bins crossed with the context groups; swap regret is measured afterward for the agents below.";
+      elements.agentNote.textContent = "Each user brings an umbrella when the forecast exceeds their personal cost, and the regret score is computed separately for each user's active days.";
       elements.algorithmNote.textContent = decisionMode
-        ? "Decision calibration controls bring/leave threshold regions crossed with context groups."
-        : "ECE multicalibration controls prediction-bin calibration residuals crossed with context groups.";
+        ? "Optimizes the umbrella-user regret score directly."
+        : "Optimizes calibration across forecast bins and context groups; umbrella regret is measured afterward.";
       renderAgents(pending.decisionMakers);
 
       const shownForecast = autoMode ? pending.prediction : last ? last.prediction : null;
       elements.status.textContent = autoMode
-        ? "Auto: next forecast visible"
+        ? "Auto weather"
         : "Manual: next forecast hidden";
       elements.forecastLabel.textContent = autoMode
-        ? "Next forecast"
+        ? "Forecast for next day"
         : last ? "Last forecast" : "Rain forecast";
       elements.forecast.textContent = shownForecast === null
         ? "Hidden"
@@ -999,7 +999,11 @@
       elements.mcError.textContent = formatProbability(metrics.multicalibrationError);
       elements.swapRegret.textContent = formatProbability(metrics.maxSwapRegret);
       elements.umbrellaRate.textContent = `${Math.round(metrics.umbrellaRate * 100)}%`;
-      elements.worstAgent.textContent = `Worst agent: ${metrics.worstDecisionAgent}`;
+      elements.worstAgent.textContent = metrics.worstDecisionAgent === "n/a"
+        ? metrics.decisionCount
+          ? "No user has positive regret yet"
+          : "No umbrella decisions yet"
+        : `Worst user: ${metrics.worstDecisionAgent}`;
       elements.decisionCount.textContent = `${metrics.decisionCount} decisions`;
       elements.worstCell.textContent = metrics.worstCellLabel === "n/a"
         ? "n/a"
@@ -1011,10 +1015,10 @@
         ? "Decision threshold partition"
         : "Adaptive prediction tree";
       elements.last.textContent = last
-        ? lastRunSummary || `Round ${last.roundNumber}: rain forecast ${formatProbability(last.prediction)}, weather ${last.outcome ? "rain" : "dry"}`
+        ? lastRunSummary || `Day ${last.roundNumber}: forecast ${formatProbability(last.prediction)}, weather ${last.outcome ? "rain" : "dry"}`
         : autoMode
-          ? "Use Next round to step once, or Run 10/50 to simulate a batch."
-          : "Choose Dry or Rain to reveal this round's sampled forecast.";
+          ? "Use Next day to step once, or Run 10/50 to simulate a batch."
+          : "Choose Dry or Rain before seeing this day's hidden forecast.";
 
       elements.outcomes.forEach((button) => {
         button.disabled = autoMode;
@@ -1022,9 +1026,11 @@
       elements.runButtons.forEach((button) => {
         button.disabled = !autoMode;
       });
+      elements.manualControls.hidden = autoMode;
+      elements.autoControls.hidden = !autoMode;
       elements.modeNote.textContent = autoMode
-        ? "Automated buttons advance the selected weather pattern without manual outcome clicks."
-        : "Manual mode uses the Dry and Rain buttons one round at a time.";
+        ? "The selected pattern chooses rain or dry automatically."
+        : "You choose whether it rains before seeing the hidden forecast.";
 
       renderDistribution(pending.distribution);
       renderTree(state.bins, decisionMode);

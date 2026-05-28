@@ -316,6 +316,20 @@
       font-weight: 800;
     }
 
+    [hidden] {
+      display: none !important;
+    }
+
+    .demo-story {
+      margin: -2px 0 18px;
+      padding: 12px 14px;
+      border-left: 4px solid var(--accent);
+      background: var(--soft);
+      color: var(--ink);
+      font-size: 0.92rem;
+      line-height: 1.45;
+    }
+
     .context-strip,
     .group-strip {
       display: flex;
@@ -393,9 +407,27 @@
       font-weight: 850;
     }
 
+    .inline-details {
+      margin-top: 18px;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .inline-details summary {
+      padding: 12px 0;
+      color: var(--ink);
+      font-size: 0.9rem;
+      font-weight: 850;
+      cursor: pointer;
+    }
+
+    .inline-details-body {
+      padding-bottom: 12px;
+    }
+
     .demo-grid {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: minmax(0, 1fr);
       gap: 12px;
       margin-top: 20px;
     }
@@ -555,10 +587,21 @@
       margin-top: 10px;
     }
 
+    .control-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
     .control-row {
       display: grid;
       gap: 8px;
       margin-top: 20px;
+    }
+
+    .control-grid .control-row {
+      margin-top: 0;
     }
 
     .control-row label {
@@ -763,6 +806,7 @@
       }
 
       .headline-metrics,
+      .control-grid,
       .auto-controls,
       .outcome-controls {
         grid-template-columns: 1fr;
@@ -835,8 +879,8 @@
       <p class="section-kicker">Interactive</p>
       <h2 id="demo-title">Rain Forecasting Game</h2>
       <p class="section-intro">
-        A short online game about forecasting rain, umbrella decisions, adaptive
-        prediction bins, and live calibration and swap-regret metrics.
+        A short online game about predicting rain and checking whether simple
+        umbrella users can safely act on the forecasts.
       </p>
 
       <div class="demo-tool" data-calibration-game>
@@ -849,21 +893,56 @@
             <span class="status-pill" data-game-status>Manual: next forecast hidden</span>
           </div>
 
-          <p class="metric-label">Next round context</p>
-          <div class="context-strip" data-game-context></div>
-          <p class="metric-note" data-game-context-note>
-            Use Next round to watch the context change; batch runs jump through
-            many contexts.
+          <p class="demo-story">
+            The forecaster predicts rain. Umbrella users act on the forecast.
+            The main score asks how much better the worst user could have done
+            by consistently changing when they bring an umbrella; lower is
+            better.
           </p>
 
-          <p class="metric-label metric-label-spaced">Swap-regret agents</p>
-          <p class="metric-note" data-game-agent-note>
-            Swap regret is evaluated separately for each decision maker on its
-            own rounds. Each has umbrella cost c and brings when p >= c; the
-            forecaster trains on these threshold regions crossed with the
-            context groups.
+          <div class="control-grid">
+            <div class="control-row">
+              <label for="game-algorithm">Forecasting goal</label>
+              <select id="game-algorithm" data-game-algorithm>
+                <option value="decision" selected>Decision calibration</option>
+                <option value="calibration">ECE multicalibration</option>
+              </select>
+              <p class="metric-note" data-game-algorithm-note></p>
+            </div>
+
+            <div class="control-row">
+              <label for="game-behavior">Weather pattern</label>
+              <select id="game-behavior" data-game-behavior>
+                <option value="manual">Manual</option>
+                <option value="always-zero">Always dry</option>
+                <option value="always-one">Always rain</option>
+                <option value="red-blue" selected>Coast rain, inland dry</option>
+                <option value="early-late">Morning rain, evening dry</option>
+                <option value="alternating">Alternating</option>
+                <option value="shift">Storm at round 25</option>
+                <option value="reactive">React to last forecast</option>
+              </select>
+              <p class="metric-note" data-game-mode-note></p>
+            </div>
+          </div>
+
+          <div class="outcome-controls" data-game-manual-controls hidden aria-label="Choose weather outcome">
+            <button class="outcome-button" type="button" data-game-outcome="0">Dry</button>
+            <button class="outcome-button" type="button" data-game-outcome="1">Rain</button>
+          </div>
+
+          <div class="auto-controls" data-game-auto-controls>
+            <button class="demo-button secondary" type="button" data-game-run="1">Next day</button>
+            <button class="demo-button secondary" type="button" data-game-run="10">Run 10</button>
+            <button class="demo-button secondary" type="button" data-game-run="50">Run 50</button>
+          </div>
+
+          <p class="metric-label metric-label-spaced">Next day context</p>
+          <div class="context-strip" data-game-context></div>
+          <p class="metric-note" data-game-context-note>
+            Use Next day to watch the context change; batch runs jump through
+            many contexts.
           </p>
-          <div class="agent-list" data-game-agents></div>
 
           <div class="demo-grid">
             <div class="metric">
@@ -871,72 +950,34 @@
               <p class="metric-value" data-game-forecast>Hidden</p>
               <p class="metric-note" data-game-last>No completed rounds yet</p>
             </div>
-            <div class="metric">
-              <p class="metric-label">Expected rain forecast</p>
-              <p class="metric-value" data-game-expected>0.5</p>
-              <p class="metric-note">Distribution mean</p>
+          </div>
+
+          <details class="inline-details">
+            <summary>Umbrella users being evaluated</summary>
+            <div class="inline-details-body">
+              <p class="metric-note" data-game-agent-note>
+                Each user follows a simple umbrella rule on the days when they
+                are active.
+              </p>
+              <div class="agent-list" data-game-agents></div>
             </div>
-            <div class="metric">
-              <p class="metric-label">Adaptive target</p>
-              <p class="metric-value" data-game-target>0.5</p>
-              <p class="metric-note">Recent rain rate</p>
-            </div>
-          </div>
+          </details>
 
-          <div class="outcome-controls" aria-label="Choose weather outcome">
-            <button class="outcome-button" type="button" data-game-outcome="0">Dry</button>
-            <button class="outcome-button" type="button" data-game-outcome="1">Rain</button>
-          </div>
-
-          <div class="control-row">
-            <label for="game-algorithm">Forecaster</label>
-            <select id="game-algorithm" data-game-algorithm>
-              <option value="decision" selected>Decision calibration</option>
-              <option value="calibration">ECE multicalibration</option>
-            </select>
-            <p class="metric-note" data-game-algorithm-note></p>
-            <p class="metric-note">
-              Algorithms: ECE multicalibration is adapted from
-              <a href="https://arxiv.org/abs/2605.09273">Huang, Morgenstern, Roth, and Zhang</a>;
-              decision calibration is adapted from
-              <a href="https://proceedings.mlr.press/v267/noarov25b.html">Noarov, Ramalingam, Roth, and Xie</a>.
-            </p>
-          </div>
-
-          <div class="control-row">
-            <label for="game-behavior">Weather pattern</label>
-            <select id="game-behavior" data-game-behavior>
-              <option value="manual">Manual</option>
-              <option value="always-zero">Always dry</option>
-              <option value="always-one">Always rain</option>
-              <option value="red-blue" selected>Coast rain, inland dry</option>
-              <option value="early-late">Morning rain, evening dry</option>
-              <option value="alternating">Alternating</option>
-              <option value="shift">Storm at round 25</option>
-              <option value="reactive">React to last forecast</option>
-            </select>
-            <p class="metric-note" data-game-mode-note></p>
-          </div>
-
-          <div class="auto-controls">
-            <button class="demo-button secondary" type="button" data-game-run="1">Next round</button>
-            <button class="demo-button secondary" type="button" data-game-run="10">Run 10</button>
-            <button class="demo-button secondary" type="button" data-game-run="50">Run 50</button>
-          </div>
           <button class="demo-button secondary reset-button" type="button" data-game-reset>Reset</button>
         </section>
 
         <aside class="demo-panel demo-panel-side" aria-label="Calibration metrics">
           <div class="headline-metrics">
             <div class="metric primary-metric">
-              <p class="metric-label">Max swap regret</p>
+              <p class="metric-label">Worst user regret</p>
               <p class="metric-value" data-game-swap-regret>0</p>
-              <p class="metric-note" data-game-worst-agent>Worst agent: n/a</p>
+              <p class="metric-note">Max swap regret; lower is better</p>
+              <p class="metric-note" data-game-worst-agent>No umbrella decisions yet</p>
             </div>
             <div class="metric primary-metric ece-metric">
-              <p class="metric-label">ECE</p>
+              <p class="metric-label">Calibration error</p>
               <p class="metric-value" data-game-cal-error>0</p>
-              <p class="metric-note">Overall calibration error</p>
+              <p class="metric-note">ECE; lower means forecasts match outcomes</p>
             </div>
           </div>
 
@@ -944,8 +985,30 @@
             <summary>Advanced diagnostics</summary>
             <div class="advanced-body">
               <div class="metric metric-spaced">
+                <p class="metric-label">Expected rain forecast</p>
+                <p class="metric-value" data-game-expected>0.5</p>
+                <p class="metric-note">Mean of the randomized forecast distribution.</p>
+              </div>
+
+              <div class="metric metric-spaced">
+                <p class="metric-label">Adaptive target</p>
+                <p class="metric-value" data-game-target>0.5</p>
+                <p class="metric-note">Recent rain rate used as a stabilizing target.</p>
+              </div>
+
+              <div class="metric metric-spaced">
                 <p class="metric-label">Context multicalibration</p>
                 <p class="metric-value" data-game-mc-error>0</p>
+              </div>
+
+              <div class="metric metric-spaced">
+                <p class="metric-label">Algorithms used</p>
+                <p class="metric-note">
+                  ECE multicalibration is adapted from
+                  <a href="https://arxiv.org/abs/2605.09273">Huang, Morgenstern, Roth, and Zhang</a>;
+                  decision calibration is adapted from
+                  <a href="https://proceedings.mlr.press/v267/noarov25b.html">Noarov, Ramalingam, Roth, and Xie</a>.
+                </p>
               </div>
 
               <div class="metric metric-spaced">
