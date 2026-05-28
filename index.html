@@ -1088,10 +1088,31 @@
               <p class="paper-meta"><strong>Authors:</strong> Ursula Hebert-Johnson, Michael Kim, Omer Reingold, Guy Rothblum. <strong>Publication:</strong> ICML 2018.</p>
               <p class="paper-note">Introduces multicalibration and multiaccuracy, gives algorithms for learning multicalibrated predictors, and connects the task to agnostic learning.</p>
             </li>
+          </ul>
+        </section>
+
+        <section class="topic" aria-labelledby="multiaccuracy-title">
+          <h3 id="multiaccuracy-title">Multiaccuracy, Relaxations, and Subgroup Auditing</h3>
+          <ul class="papers">
+            <li class="paper">
+              <p class="paper-title"><a href="https://arxiv.org/abs/1805.12317">Multiaccuracy: Black-Box Post-Processing for Fairness in Classification</a></p>
+              <p class="paper-meta"><strong>Authors:</strong> Michael P. Kim, Amirata Ghorbani, James Zou. <strong>Publication:</strong> AIES 2019.</p>
+              <p class="paper-note">Develops multiaccuracy auditing and black-box post-processing as a practical way to remove systematic subgroup residual bias without retraining or white-box access to the original predictor.</p>
+            </li>
+            <li class="paper">
+              <p class="paper-title"><a href="https://arxiv.org/abs/2203.01255">Low-Degree Multicalibration</a></p>
+              <p class="paper-meta"><strong>Authors:</strong> Parikshit Gopalan, Michael Kim, Mihir Singhal, Shengjia Zhao. <strong>Publication:</strong> arXiv, 2022.</p>
+              <p class="paper-note">Defines low-degree multicalibration as an efficient hierarchy between multiaccuracy and full multicalibration that retains key fairness and accuracy guarantees.</p>
+            </li>
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2504.15206">How Global Calibration Strengthens Multiaccuracy</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Silvia Casacuberta, Parikshit Gopalan, Varun Kanade, Omer Reingold. <strong>Publication:</strong> arXiv, 2025.</p>
               <p class="paper-note">Clarifies the hierarchy between multiaccuracy, calibrated multiaccuracy, and multicalibration by showing that global calibration makes multiaccuracy much more powerful.</p>
+            </li>
+            <li class="paper">
+              <p class="paper-title"><a href="https://proceedings.mlr.press/v267/bharti25a.html">Multiaccuracy and Multicalibration via Proxy Groups</a></p>
+              <p class="paper-meta"><strong>Authors:</strong> Beepul Bharti, Mary Versa Clemens-Sewall, Paul H. Yi, Jeremias Sulam. <strong>Publication:</strong> ICML 2025.</p>
+              <p class="paper-note">Shows how proxy-sensitive attributes can upper-bound and help mitigate multiaccuracy and multicalibration violations when true sensitive-group labels are missing.</p>
             </li>
           </ul>
         </section>
@@ -1141,9 +1162,9 @@
               <p class="paper-note">Introduces multicalibrated partitions to compute importance weights from samples with set-wise sandwiching guarantees.</p>
             </li>
             <li class="paper">
-              <p class="paper-title"><a href="https://arxiv.org/abs/2203.01255">Low-Degree Multicalibration</a></p>
-              <p class="paper-meta"><strong>Authors:</strong> Parikshit Gopalan, Michael Kim, Mihir Singhal, Shengjia Zhao. <strong>Publication:</strong> arXiv, 2022.</p>
-              <p class="paper-note">Defines low-degree multicalibration as an efficient hierarchy between multiaccuracy and full multicalibration that retains key fairness and accuracy guarantees.</p>
+              <p class="paper-title"><a href="https://arxiv.org/abs/2209.04892">Calibeating: Beating Forecasters at Their Own Game</a></p>
+              <p class="paper-meta"><strong>Authors:</strong> Dean P. Foster, Sergiu Hart. <strong>Publication:</strong> Theoretical Economics, 2023.</p>
+              <p class="paper-note">Introduces calibeating, showing how to post-process external forecasts online to improve calibration without losing refinement or Brier-score performance.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2209.07312">Multicalibrated Regression for Downstream Fairness</a></p>
@@ -1166,9 +1187,19 @@
               <p class="paper-note">Gives direct online L1-multicalibration algorithms with improved rates and an oracle-efficient variant for large or infinite group families.</p>
             </li>
             <li class="paper">
+              <p class="paper-title"><a href="https://arxiv.org/abs/2505.17435">Discretization-free Multicalibration through Loss Minimization over Tree Ensembles</a></p>
+              <p class="paper-meta"><strong>Authors:</strong> Hongyi Henry Jin, Zijun Ding, Dung Daniel Ngo, Zhiwei Steven Wu. <strong>Publication:</strong> NeurIPS 2025.</p>
+              <p class="paper-note">Gives an ERM-based, discretization-free multicalibration method over depth-two tree ensembles that can be implemented with off-the-shelf gradient-boosted tree methods.</p>
+            </li>
+            <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2601.05245">Optimal Lower Bounds for Online Multicalibration</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Natalie Collina, Jiuyao Lu, Georgy Noarov, Aaron Roth. <strong>Publication:</strong> arXiv, 2026.</p>
               <p class="paper-note">Establishes the minimax rate for online multicalibration by proving lower bounds that match existing upper bounds up to logarithmic factors.</p>
+            </li>
+            <li class="paper">
+              <p class="paper-title"><a href="https://arxiv.org/abs/2603.22167">Calibeating Made Simple</a></p>
+              <p class="paper-meta"><strong>Authors:</strong> Yurong Chen, Zhiyi Huang, Michael I. Jordan, Haipeng Luo. <strong>Publication:</strong> arXiv, 2026.</p>
+              <p class="paper-note">Reduces calibeating and multi-calibeating to standard regret-minimization problems, yielding optimal rates for broad classes of proper losses.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2604.19592">An Efficient Black-Box Reduction from Online Learning to Multicalibration, and a New Route to Phi-Regret Minimization</a></p>
@@ -1200,6 +1231,11 @@
               <p class="paper-title"><a href="https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.ITCS.2023.41">HappyMap: A Generalized Multicalibration Method</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Zhun Deng, Cynthia Dwork, Linjun Zhang. <strong>Publication:</strong> ITCS 2023.</p>
               <p class="paper-note">Introduces s-Happy multicalibration and a HappyMap meta-algorithm that unifies and extends applications to covariate shift, missing data, uncertainty, and fairness.</p>
+            </li>
+            <li class="paper">
+              <p class="paper-title"><a href="https://arxiv.org/abs/2405.18206">Multi-CATE: Multi-Accurate Conditional Average Treatment Effect Estimation Robust to Unknown Covariate Shifts</a></p>
+              <p class="paper-meta"><strong>Authors:</strong> Christoph Kern, Michael P. Kim, Angela Zhou. <strong>Publication:</strong> arXiv, 2024.</p>
+              <p class="paper-note">Uses multiaccurate post-processing to make conditional average treatment-effect estimates robust to unknown covariate shifts at deployment time.</p>
             </li>
             <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2406.00661">Bridging Multicalibration and Out-of-Distribution Generalization Beyond Covariate Shift</a></p>
@@ -1279,14 +1315,29 @@
               <p class="paper-note">Develops oracle-efficient online multicalibration for infinite benchmark classes and derives the first oracle-efficient online omnipredictor.</p>
             </li>
             <li class="paper">
+              <p class="paper-title"><a href="https://arxiv.org/abs/2501.17205">Near-Optimal Algorithms for Omniprediction</a></p>
+              <p class="paper-meta"><strong>Authors:</strong> Princewill Okoroafor, Robert Kleinberg, Michael P. Kim. <strong>Publication:</strong> FOCS 2025.</p>
+              <p class="paper-note">Gives near-optimal online and offline omniprediction algorithms whose online regret nearly matches single-loss learning rates.</p>
+            </li>
+            <li class="paper">
+              <p class="paper-title"><a href="https://arxiv.org/abs/2502.12564">Sample Efficient Omniprediction and Downstream Swap Regret for Non-Linear Losses</a></p>
+              <p class="paper-meta"><strong>Authors:</strong> Jiuyao Lu, Aaron Roth, Mirah Shi. <strong>Publication:</strong> arXiv, 2025.</p>
+              <p class="paper-note">Defines decision swap regret, generalizing omniprediction and downstream swap regret, and gives online and batch algorithms for multidimensional nonlinear Lipschitz losses.</p>
+            </li>
+            <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2505.20885">Improved Bounds for Swap Multicalibration and Swap Omniprediction</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Haipeng Luo, Spandan Senapati, Vatsal Sharan. <strong>Publication:</strong> NeurIPS 2025.</p>
               <p class="paper-note">Improves online swap multicalibration and swap omniprediction rates and translates them into better distributional sample-complexity bounds.</p>
             </li>
             <li class="paper">
-              <p class="paper-title"><a href="https://arxiv.org/abs/2501.17205">Near-Optimal Algorithms for Omniprediction</a></p>
-              <p class="paper-meta"><strong>Authors:</strong> Princewill Okoroafor, Robert Kleinberg, Michael P. Kim. <strong>Publication:</strong> FOCS 2025.</p>
-              <p class="paper-note">Gives near-optimal online and offline omniprediction algorithms whose online regret nearly matches single-loss learning rates.</p>
+              <p class="paper-title"><a href="https://arxiv.org/abs/2509.11357">Online Omniprediction with Long-Term Constraints</a></p>
+              <p class="paper-meta"><strong>Authors:</strong> Yahav Bechavod, Jiuyao Lu, Aaron Roth. <strong>Publication:</strong> arXiv, 2025.</p>
+              <p class="paper-note">Introduces online omniprediction with long-term constraints, where one prediction stream lets many downstream agents obtain no-regret guarantees while satisfying cumulative constraints.</p>
+            </li>
+            <li class="paper">
+              <p class="paper-title"><a href="https://arxiv.org/abs/2511.04907">Efficient Swap Multicalibration of Elicitable Properties</a></p>
+              <p class="paper-meta"><strong>Authors:</strong> Lunjia Hu, Haipeng Luo, Spandan Senapati, Vatsal Sharan. <strong>Publication:</strong> arXiv, 2025.</p>
+              <p class="paper-note">Extends swap multicalibration from means to general elicitable properties and gives oracle-efficient online algorithms with improved rates.</p>
             </li>
           </ul>
         </section>
@@ -1331,6 +1382,11 @@
               <p class="paper-note">Extends distance to calibration to sequential prediction and nonconstructively establishes the existence of an online forecasting algorithm with O(sqrt(T)) adversarial distance to calibration.</p>
             </li>
             <li class="paper">
+              <p class="paper-title"><a href="https://proceedings.mlr.press/v247/gopalan24a.html">On Computationally Efficient Multi-Class Calibration</a></p>
+              <p class="paper-meta"><strong>Authors:</strong> Parikshit Gopalan, Lunjia Hu, Guy N. Rothblum. <strong>Publication:</strong> COLT 2024.</p>
+              <p class="paper-note">Introduces projected smooth calibration for multiclass prediction, giving polynomial-in-k recalibration algorithms while proving barriers for stronger multiclass calibration notions.</p>
+            </li>
+            <li class="paper">
               <p class="paper-title"><a href="https://arxiv.org/abs/2402.08753">Forecasting for Swap Regret for All Downstream Agents</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Aaron Roth, Mirah Shi. <strong>Publication:</strong> EC 2024.</p>
               <p class="paper-note">Shows that event-unbiased forecasts can give all downstream best-responding agents low swap regret with better dimension dependence than calibrated forecasts.</p>
@@ -1365,6 +1421,16 @@
               <p class="paper-meta"><strong>Authors:</strong> Jason Hartline, Yifan Wu, Yunran Yang. <strong>Publication:</strong> FORC 2025.</p>
               <p class="paper-note">Shows how post-processing low distance-to-calibration forecasts can achieve decision-theoretic calibration measures such as ECE and calibration decision loss.</p>
             </li>
+            <li class="paper">
+              <p class="paper-title"><a href="https://arxiv.org/abs/2508.13100">A Perfectly Truthful Calibration Measure</a></p>
+              <p class="paper-meta"><strong>Authors:</strong> Jason Hartline, Lunjia Hu, Yifan Wu. <strong>Publication:</strong> arXiv, 2025.</p>
+              <p class="paper-note">Introduces averaged two-bin calibration error, a perfectly truthful batch calibration measure that is sound, complete, continuous, and efficiently computable.</p>
+            </li>
+            <li class="paper">
+              <p class="paper-title"><a href="https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.ITCS.2026.48">Auditability and the Landscape of Distance to Multicalibration</a></p>
+              <p class="paper-meta"><strong>Authors:</strong> Nathan Derhake, Siddartha Devic, Dutch Hansen, Kuan Liu, Vatsal Sharan. <strong>Publication:</strong> ITCS 2026.</p>
+              <p class="paper-note">Studies metrics for distance to multicalibration, showing that natural dCE-style generalizations fail either auditability or geometric desiderata and proposing auditable alternatives.</p>
+            </li>
           </ul>
         </section>
 
@@ -1396,6 +1462,11 @@
               <p class="paper-title"><a href="https://proceedings.mlr.press/v235/detommaso24a.html">Multicalibration for Confidence Scoring in LLMs</a></p>
               <p class="paper-meta"><strong>Authors:</strong> Gianluca Detommaso, Martin Andres Bertran, Riccardo Fogliato, Aaron Roth. <strong>Publication:</strong> ICML 2024.</p>
               <p class="paper-note">Applies multicalibration to LLM confidence scoring using embedding clusters and self-annotation groups, with algorithmic variants that reduce overfitting.</p>
+            </li>
+            <li class="paper">
+              <p class="paper-title"><a href="https://arxiv.org/abs/2509.19884">MCGrad: Multicalibration at Web Scale</a></p>
+              <p class="paper-meta"><strong>Authors:</strong> Niek Tax, Lorenzo Perini, Fridolin Linder, Daniel Haimovich, Dima Karamshuk, Nastaran Okati, Milan Vojnovic, Pavlos Athanasios Apostolopoulos. <strong>Publication:</strong> KDD 2026.</p>
+              <p class="paper-note">Proposes MCGrad, a scalable multicalibration algorithm that avoids manually specifying subgroups and has been deployed in large-scale production systems.</p>
             </li>
           </ul>
         </section>
