@@ -831,10 +831,12 @@
     let core = new CalibrationGameCore(coreOptions());
     const elements = {
       round: root.querySelector("[data-game-round]"),
+      status: root.querySelector("[data-game-status]"),
       context: root.querySelector("[data-game-context]"),
       agents: root.querySelector("[data-game-agents]"),
       agentNote: root.querySelector("[data-game-agent-note]"),
       calibrationGroups: root.querySelector("[data-game-calibration-groups]"),
+      forecastLabel: root.querySelector("[data-game-forecast-label]"),
       forecast: root.querySelector("[data-game-forecast]"),
       expected: root.querySelector("[data-game-expected]"),
       target: root.querySelector("[data-game-target]"),
@@ -946,7 +948,17 @@
         ? "Decision calibration controls bring/leave threshold regions crossed with context groups."
         : "ECE multicalibration controls prediction-bin calibration residuals crossed with context groups.";
       renderAgents(pending.decisionMakers);
-      elements.forecast.textContent = "Locked";
+
+      const shownForecast = autoMode ? pending.prediction : last ? last.prediction : null;
+      elements.status.textContent = autoMode
+        ? "Auto: next forecast visible"
+        : "Manual: next forecast hidden";
+      elements.forecastLabel.textContent = autoMode
+        ? "Next forecast"
+        : last ? "Last forecast" : "Rain forecast";
+      elements.forecast.textContent = shownForecast === null
+        ? "Hidden"
+        : formatProbability(shownForecast);
       elements.expected.textContent = formatProbability(pending.expectedPrediction);
       elements.target.textContent = formatProbability(pending.target);
       elements.calError.textContent = formatProbability(metrics.calibrationError);
@@ -966,7 +978,9 @@
         : "Adaptive prediction tree";
       elements.last.textContent = last
         ? `Round ${last.roundNumber}: rain forecast ${formatProbability(last.prediction)}, weather ${last.outcome ? "rain" : "dry"}`
-        : "No completed rounds yet";
+        : autoMode
+          ? "Run 10 or 50 rounds to simulate the selected weather pattern."
+          : "Choose Dry or Rain to reveal this round's sampled forecast.";
 
       elements.outcomes.forEach((button) => {
         button.disabled = autoMode;
