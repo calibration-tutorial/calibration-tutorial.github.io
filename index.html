@@ -897,7 +897,9 @@
             The forecaster predicts rain. Umbrella users act on the forecast.
             The main score asks how much better the worst user could have done
             by consistently changing when they bring an umbrella; lower is
-            better.
+            better. Decision calibration directly targets this regret, not
+            ECE; ECE multicalibration aims to reduce calibration error, with
+            low swap regret following as a corollary.
           </p>
 
           <div class="control-grid">
