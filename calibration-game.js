@@ -38,12 +38,14 @@
 
   const OBJECTIVE_DEFAULTS = {
     calibration: {
-      eta: 2.5,
-      eviTieSlack: 0.005
+      eta: 4,
+      slackFactor: 0,
+      maxDepth: 8,
+      eviTieSlack: 0
     },
     decision: {
-      eta: 10,
-      eviTieSlack: 0.02
+      eta: 4,
+      eviTieSlack: 0
     }
   };
 
@@ -250,7 +252,11 @@
     }
 
     setScore(groupId, bin, sign, value) {
-      this.scores.set(this.expertKey(groupId, bin, sign), Math.max(-40, Math.min(40, value)));
+      this.scores.set(this.expertKey(groupId, bin, sign), value);
+    }
+
+    learningRate() {
+      return this.options.eta / Math.sqrt(this.history.length + 1);
     }
 
     targetFor(context) {
@@ -324,7 +330,7 @@
       for (const bin of this.bins) {
         for (const groupId of this.testGroupIds(context)) {
           for (const sign of ["+", "-"]) {
-            const logit = this.options.eta * this.getScore(groupId, bin, sign);
+            const logit = this.learningRate() * this.getScore(groupId, bin, sign);
             weightedExperts.push({ bin, groupId, sign, logit });
             maxLogit = Math.max(maxLogit, logit);
           }
@@ -373,7 +379,7 @@
     }
 
     setDecisionScore(groupId, makerId, swap, value) {
-      this.scores.set(this.decisionExpertKey(groupId, makerId, swap), Math.max(-40, Math.min(40, value)));
+      this.scores.set(this.decisionExpertKey(groupId, makerId, swap), value);
     }
 
     solveDecisionEvi(context) {
@@ -385,7 +391,7 @@
       for (const groupId of activeGroupIds) {
         for (const maker of DECISION_MAKERS) {
           for (const swap of ["bring-to-leave", "leave-to-bring"]) {
-            const logit = this.options.eta * this.getDecisionScore(groupId, maker.id, swap);
+            const logit = this.learningRate() * this.getDecisionScore(groupId, maker.id, swap);
             weightedExperts.push({ groupId, maker, swap, logit });
             maxLogit = Math.max(maxLogit, logit);
           }

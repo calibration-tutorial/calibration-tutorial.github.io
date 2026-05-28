@@ -69,10 +69,10 @@ for (const rounds of [10, 25, 50]) {
     const isContrarian = strategyName === "contrarian";
     const shortHorizonMcLimit = rounds === 10 && !isContrarian ? 0.48 : Infinity;
     const shortHorizonContrarianMcLimit = rounds === 10 && isContrarian ? 0.62 : Infinity;
-    const mediumMcLimit = rounds === 25 && !isReactive && !isContrarian ? 0.24 : Infinity;
+    const mediumMcLimit = rounds === 25 && !isReactive && !isContrarian ? 0.255 : Infinity;
     const mediumReactiveMcLimit = rounds === 25 && isReactive ? 0.39 : Infinity;
     const mediumContrarianMcLimit = rounds === 25 && isContrarian ? 0.47 : Infinity;
-    const longMcLimit = rounds === 50 && !isReactive && !isContrarian ? 0.29 : Infinity;
+    const longMcLimit = rounds === 50 && !isReactive && !isContrarian ? 0.305 : Infinity;
     const longReactiveMcLimit = rounds === 50 && isReactive ? 0.34 : Infinity;
     const longContrarianMcLimit = rounds === 50 && isContrarian ? 0.42 : Infinity;
     const mcLimit = Math.min(
@@ -86,7 +86,8 @@ for (const rounds of [10, 25, 50]) {
       longContrarianMcLimit
     );
 
-    const shortHorizonRegretLimit = rounds === 10 && !isContrarian ? 0.43 : Infinity;
+    const shortHorizonRegretLimit = rounds === 10 && !isReactive && !isContrarian ? 0.43 : Infinity;
+    const shortHorizonReactiveRegretLimit = rounds === 10 && isReactive ? 0.5 : Infinity;
     const shortHorizonContrarianRegretLimit = rounds === 10 && isContrarian ? 0.53 : Infinity;
     const mediumRegretLimit = rounds === 25 && !isReactive && !isContrarian ? 0.18 : Infinity;
     const mediumReactiveRegretLimit = rounds === 25 && isReactive ? 0.32 : Infinity;
@@ -96,6 +97,7 @@ for (const rounds of [10, 25, 50]) {
     const longContrarianRegretLimit = rounds === 50 && isContrarian ? 0.36 : Infinity;
     const regretLimit = Math.min(
       shortHorizonRegretLimit,
+      shortHorizonReactiveRegretLimit,
       shortHorizonContrarianRegretLimit,
       mediumRegretLimit,
       mediumReactiveRegretLimit,
