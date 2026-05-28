@@ -116,6 +116,12 @@
         const last = history[history.length - 1];
         return last && last.prediction < 0.55 ? 1 : 0;
       }
+    },
+    contrarian: {
+      label: "Contrarian",
+      outcome: (_history, _context, _roundIndex, expectedPrediction) => (
+        expectedPrediction <= 0.5 ? 1 : 0
+      )
     }
   };
 
@@ -676,7 +682,12 @@
       if (!strategy) {
         throw new Error(`Unknown strategy: ${strategyName}`);
       }
-      return strategy.outcome(this.history, this.pending.context, this.history.length);
+      return strategy.outcome(
+        this.history,
+        this.pending.context,
+        this.history.length,
+        this.pending.expectedPrediction
+      );
     }
 
     runStrategy(strategyName, rounds) {
