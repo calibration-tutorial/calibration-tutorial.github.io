@@ -545,7 +545,7 @@
 
     .auto-controls {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 10px;
       margin-top: 14px;
     }
@@ -849,8 +849,12 @@
             <span class="status-pill" data-game-status>Manual: next forecast hidden</span>
           </div>
 
-          <p class="metric-label">Weather setting</p>
+          <p class="metric-label">Next round context</p>
           <div class="context-strip" data-game-context></div>
+          <p class="metric-note" data-game-context-note>
+            Use Next round to watch the context change; batch runs jump through
+            many contexts.
+          </p>
 
           <p class="metric-label metric-label-spaced">Swap-regret agents</p>
           <p class="metric-note" data-game-agent-note>
@@ -915,6 +919,7 @@
           </div>
 
           <div class="auto-controls">
+            <button class="demo-button secondary" type="button" data-game-run="1">Next round</button>
             <button class="demo-button secondary" type="button" data-game-run="10">Run 10</button>
             <button class="demo-button secondary" type="button" data-game-run="50">Run 50</button>
           </div>

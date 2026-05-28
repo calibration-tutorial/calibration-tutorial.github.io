@@ -827,12 +827,21 @@
     return value.toFixed(3).replace(/0+$/, "").replace(/\.$/, "");
   }
 
+  function contextLabel(context) {
+    return [
+      context.region === "coast" ? "Coast" : "Inland",
+      context.period === "morning" ? "Morning" : "Evening"
+    ];
+  }
+
   function createCalibrationGame(root, options = {}) {
     let core = new CalibrationGameCore(coreOptions());
+    let lastRunSummary = "";
     const elements = {
       round: root.querySelector("[data-game-round]"),
       status: root.querySelector("[data-game-status]"),
       context: root.querySelector("[data-game-context]"),
+      contextNote: root.querySelector("[data-game-context-note]"),
       agents: root.querySelector("[data-game-agents]"),
       agentNote: root.querySelector("[data-game-agent-note]"),
       calibrationGroups: root.querySelector("[data-game-calibration-groups]"),
@@ -857,8 +866,7 @@
       behavior: root.querySelector("[data-game-behavior]"),
       modeNote: root.querySelector("[data-game-mode-note]"),
       advanced: root.querySelector("[data-game-advanced]"),
-      run10: root.querySelector("[data-game-run='10']"),
-      run50: root.querySelector("[data-game-run='50']"),
+      runButtons: Array.from(root.querySelectorAll("[data-game-run]")),
       reset: root.querySelector("[data-game-reset]"),
       outcomes: Array.from(root.querySelectorAll("[data-game-outcome]")),
       canvas: root.querySelector("[data-game-chart]")
@@ -866,12 +874,16 @@
 
     elements.outcomes.forEach((button) => {
       button.addEventListener("click", () => {
+        lastRunSummary = "";
         core.submitOutcome(Number(button.dataset.gameOutcome));
         render();
       });
     });
 
-    elements.behavior.addEventListener("change", render);
+    elements.behavior.addEventListener("change", () => {
+      lastRunSummary = "";
+      render();
+    });
 
     elements.algorithm.addEventListener("change", () => {
       resetCore();
@@ -880,12 +892,10 @@
 
     elements.advanced.addEventListener("toggle", render);
 
-    elements.run10.addEventListener("click", () => {
-      runSelectedBehavior(10);
-    });
-
-    elements.run50.addEventListener("click", () => {
-      runSelectedBehavior(50);
+    elements.runButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        runSelectedBehavior(Number(button.dataset.gameRun));
+      });
     });
 
     elements.reset.addEventListener("click", () => {
@@ -913,6 +923,7 @@
         ...options,
         ...selectedObjectiveOptions()
       });
+      lastRunSummary = "";
     }
 
     function runSelectedBehavior(rounds) {
@@ -920,8 +931,27 @@
       if (behavior === "manual") {
         return;
       }
-      core.runStrategy(behavior, rounds);
+      lastRunSummary = summarizeRun(core.runStrategy(behavior, rounds));
       render();
+    }
+
+    function summarizeRun(results) {
+      if (!results.length) {
+        return "";
+      }
+
+      const records = results.map((result) => result.record);
+      const first = records[0];
+      const lastRecord = records[records.length - 1];
+      const coastCount = records.filter((record) => record.context.region === "coast").length;
+      const morningCount = records.filter((record) => record.context.period === "morning").length;
+      const rainCount = records.filter((record) => record.outcome === 1).length;
+      const range = first.roundNumber === lastRecord.roundNumber
+        ? `round ${first.roundNumber}`
+        : `rounds ${first.roundNumber}-${lastRecord.roundNumber}`;
+
+      return `Last run: ${range}; ${coastCount} coast/${records.length - coastCount} inland, ` +
+        `${morningCount} morning/${records.length - morningCount} evening, ${rainCount} rain.`;
     }
 
     function render() {
@@ -931,12 +961,16 @@
       const last = state.history[state.history.length - 1];
       const autoMode = elements.behavior.value !== "manual";
       const decisionMode = core.options.objective === "decision";
+      const [regionLabel, periodLabel] = contextLabel(pending.context);
 
       elements.round.textContent = String(pending.roundNumber);
       elements.context.innerHTML = [
-        `<span>${pending.context.region === "coast" ? "Coast" : "Inland"}</span>`,
-        `<span>${pending.context.period === "morning" ? "Morning" : "Evening"}</span>`
+        `<span>${regionLabel}</span>`,
+        `<span>${periodLabel}</span>`
       ].join("");
+      elements.contextNote.textContent = autoMode
+        ? "This is the next round only. Next round steps once; Run 10 and Run 50 jump through full context cycles, so they can end on the same next context."
+        : "This is the context for the next manual round.";
       elements.calibrationGroups.innerHTML = [
         { label: "All forecasts" },
         ...state.calibrationGroups
@@ -977,18 +1011,19 @@
         ? "Decision threshold partition"
         : "Adaptive prediction tree";
       elements.last.textContent = last
-        ? `Round ${last.roundNumber}: rain forecast ${formatProbability(last.prediction)}, weather ${last.outcome ? "rain" : "dry"}`
+        ? lastRunSummary || `Round ${last.roundNumber}: rain forecast ${formatProbability(last.prediction)}, weather ${last.outcome ? "rain" : "dry"}`
         : autoMode
-          ? "Run 10 or 50 rounds to simulate the selected weather pattern."
+          ? "Use Next round to step once, or Run 10/50 to simulate a batch."
           : "Choose Dry or Rain to reveal this round's sampled forecast.";
 
       elements.outcomes.forEach((button) => {
         button.disabled = autoMode;
       });
-      elements.run10.disabled = !autoMode;
-      elements.run50.disabled = !autoMode;
+      elements.runButtons.forEach((button) => {
+        button.disabled = !autoMode;
+      });
       elements.modeNote.textContent = autoMode
-        ? "Run buttons advance the selected automated weather pattern."
+        ? "Automated buttons advance the selected weather pattern without manual outcome clicks."
         : "Manual mode uses the Dry and Rain buttons one round at a time.";
 
       renderDistribution(pending.distribution);
