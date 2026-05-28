@@ -853,12 +853,11 @@
       last: root.querySelector("[data-game-last]"),
       calError: root.querySelector("[data-game-cal-error]"),
       mcError: root.querySelector("[data-game-mc-error]"),
+      worstGroup: root.querySelector("[data-game-worst-group]"),
       swapRegret: root.querySelector("[data-game-swap-regret]"),
       umbrellaRate: root.querySelector("[data-game-umbrella-rate]"),
       worstAgent: root.querySelector("[data-game-worst-agent]"),
       decisionCount: root.querySelector("[data-game-decision-count]"),
-      worstCell: root.querySelector("[data-game-worst-cell]"),
-      activeBins: root.querySelector("[data-game-active-bins]"),
       treeLabel: root.querySelector("[data-game-tree-label]"),
       algorithm: root.querySelector("[data-game-algorithm]"),
       algorithmNote: root.querySelector("[data-game-algorithm-note]"),
@@ -995,6 +994,7 @@
       elements.expected.textContent = formatProbability(pending.expectedPrediction);
       elements.calError.textContent = formatProbability(metrics.calibrationError);
       elements.mcError.textContent = formatProbability(metrics.multicalibrationError);
+      elements.worstGroup.textContent = `Worst group: ${metrics.worstGroup}`;
       elements.swapRegret.textContent = formatProbability(metrics.maxSwapRegret);
       elements.umbrellaRate.textContent = `${Math.round(metrics.umbrellaRate * 100)}%`;
       elements.worstAgent.textContent = metrics.worstDecisionAgent === "n/a"
@@ -1003,12 +1003,6 @@
           : "No umbrella decisions yet"
         : `Worst user: ${metrics.worstDecisionAgent}`;
       elements.decisionCount.textContent = `${metrics.decisionCount} decisions`;
-      elements.worstCell.textContent = metrics.worstCellLabel === "n/a"
-        ? "n/a"
-        : `${metrics.worstCellLabel}: ${formatProbability(metrics.worstCell)}`;
-      elements.activeBins.textContent = decisionMode
-        ? `${metrics.activeBins} threshold regions`
-        : `${metrics.activeBins} bins`;
       elements.treeLabel.textContent = decisionMode
         ? "Decision threshold partition"
         : "Adaptive prediction tree";

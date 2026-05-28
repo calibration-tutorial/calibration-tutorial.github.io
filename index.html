@@ -993,8 +993,9 @@
               </div>
 
               <div class="metric metric-spaced">
-                <p class="metric-label">Context multicalibration</p>
+                <p class="metric-label">Multicalibration error</p>
                 <p class="metric-value" data-game-mc-error>0</p>
+                <p class="metric-note" data-game-worst-group>Worst group: n/a</p>
               </div>
 
               <div class="metric metric-spaced">
@@ -1019,12 +1020,6 @@
                 <p class="metric-note" data-game-decision-count>0 decisions</p>
               </div>
 
-              <div class="metric metric-spaced">
-                <p class="metric-label">Worst calibration cell</p>
-                <p class="metric-value metric-value-small" data-game-worst-cell>n/a</p>
-                <p class="metric-note" data-game-active-bins>4 bins</p>
-              </div>
-
               <p class="metric-label metric-label-spaced" data-game-tree-label>Decision threshold partition</p>
               <div class="tree-wrap" data-game-tree></div>
 
@@ -1035,7 +1030,7 @@
                 <canvas data-game-chart aria-label="Calibration error over time"></canvas>
               </div>
               <div class="legend">
-                <span>Context multicalibration</span>
+                <span>Multicalibration</span>
                 <span>Calibration</span>
                 <span>Swap regret</span>
               </div>
