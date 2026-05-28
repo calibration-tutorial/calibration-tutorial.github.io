@@ -848,7 +848,6 @@
       forecastLabel: root.querySelector("[data-game-forecast-label]"),
       forecast: root.querySelector("[data-game-forecast]"),
       expected: root.querySelector("[data-game-expected]"),
-      target: root.querySelector("[data-game-target]"),
       distribution: root.querySelector("[data-game-distribution]"),
       tree: root.querySelector("[data-game-tree]"),
       last: root.querySelector("[data-game-last]"),
@@ -994,7 +993,6 @@
         ? "Hidden"
         : formatProbability(shownForecast);
       elements.expected.textContent = formatProbability(pending.expectedPrediction);
-      elements.target.textContent = formatProbability(pending.target);
       elements.calError.textContent = formatProbability(metrics.calibrationError);
       elements.mcError.textContent = formatProbability(metrics.multicalibrationError);
       elements.swapRegret.textContent = formatProbability(metrics.maxSwapRegret);
@@ -1204,7 +1202,6 @@
           .filter((maker) => maker.active)
           .map((maker) => maker.label),
         expectedPrediction: pending.expectedPrediction,
-        target: pending.target,
         metrics: state.metrics
       });
     };
