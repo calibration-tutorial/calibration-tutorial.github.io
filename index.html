@@ -266,8 +266,7 @@
     }
 
     .roadmap-item p,
-    .materials-panel p,
-    .theme-panel p {
+    .materials-panel p {
       margin: 10px 0 0;
       color: var(--muted);
     }
@@ -301,76 +300,12 @@
       color: var(--accent-strong);
     }
 
-    .theme-panel,
     .materials-panel {
       margin-top: 30px;
       padding: 22px;
       border: 1px solid var(--line);
       border-radius: 8px;
       background: var(--panel);
-    }
-
-    .theme-grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(260px, 0.72fr);
-      gap: 22px;
-      align-items: start;
-    }
-
-    .theme-list {
-      display: grid;
-      gap: 10px;
-      margin: 4px 0 0;
-      padding: 0;
-      list-style: none;
-    }
-
-    .theme-aside {
-      min-width: 0;
-    }
-
-    .theme-list li {
-      padding-left: 14px;
-      border-left: 3px solid var(--accent);
-      color: var(--ink);
-    }
-
-    .agreement-visual {
-      display: grid;
-      grid-template-columns: minmax(58px, 0.72fr) auto minmax(58px, 0.72fr);
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 16px;
-      padding: 10px 12px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #fbfcfd;
-    }
-
-    .agreement-visual img {
-      width: 100%;
-      max-height: 98px;
-      object-fit: contain;
-    }
-
-    .agreement-exchange {
-      display: grid;
-      gap: 8px;
-      justify-items: center;
-    }
-
-    .conversation-bubble {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 36px;
-      height: 28px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      background: var(--soft);
-      color: var(--accent-strong);
-      font-weight: 850;
-      font-style: italic;
     }
 
     .materials-actions {
@@ -1022,8 +957,7 @@
         grid-template-columns: 1fr;
       }
 
-      .roadmap-grid,
-      .theme-grid {
+      .roadmap-grid {
         grid-template-columns: 1fr;
       }
 
@@ -1233,7 +1167,6 @@
             behavioral conditions.
           </p>
           <div class="roadmap-links">
-            <a href="#agreement-overview">Overview</a>
             <a href="#agreement-title">Agreement readings</a>
           </div>
         </article>
@@ -1438,50 +1371,6 @@
             </div>
           </details>
         </aside>
-      </div>
-    </section>
-
-    <section id="agreement-overview" class="content" aria-labelledby="agreement-overview-title">
-      <p class="section-kicker">Collaboration</p>
-      <h2 id="agreement-overview-title">Agreement as a calibration problem</h2>
-      <p class="section-intro">
-        The later part of the tutorial uses calibration to study how two agents
-        can exchange predictions, reach agreement quickly, and aggregate
-        complementary information without sharing their raw features.
-      </p>
-
-      <div class="theme-panel">
-        <div class="theme-grid">
-          <div>
-            <p>
-              Classical agreement theorems assume idealized Bayesian agents
-              with common priors. The tutorial replaces that assumption with
-              conversation calibration: each agent's next prediction should be
-              calibrated on subsequences defined by the other agent's previous
-              prediction.
-            </p>
-            <p>
-              Strengthening this to conversation multicalibration connects
-              agreement to accuracy: agents can converge to predictions that
-              compete with models using their joint feature space.
-            </p>
-          </div>
-          <div class="theme-aside">
-            <div class="agreement-visual" aria-label="Two prediction agents exchanging forecasts">
-              <img src="assets/characters/learner-thinking.png" width="145" height="420" loading="lazy" decoding="async" alt="">
-              <span class="agreement-exchange" aria-hidden="true">
-                <span class="conversation-bubble">p</span>
-                <span class="conversation-bubble">q</span>
-              </span>
-              <img src="assets/characters/learner-thumbs-up.png" width="200" height="420" loading="lazy" decoding="async" alt="">
-            </div>
-            <ul class="theme-list">
-              <li>Conversation calibration gives a behavioral route to fast agreement.</li>
-              <li>Conversation multicalibration supports information aggregation.</li>
-              <li>The framework applies to human-AI and multi-agent prediction settings.</li>
-            </ul>
-          </div>
-        </div>
       </div>
     </section>
 
