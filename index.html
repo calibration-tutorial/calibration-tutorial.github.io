@@ -159,6 +159,38 @@
       background: linear-gradient(180deg, #fbfcfd 0%, var(--soft) 100%);
     }
 
+    .calibration-cast {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .cast-character {
+      width: clamp(54px, 22%, 78px);
+      max-height: 86px;
+      object-fit: contain;
+    }
+
+    .cast-weather {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 42px;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.82);
+    }
+
+    .cast-weather img {
+      width: 30px;
+      height: 30px;
+      object-fit: contain;
+    }
+
     .calibration-figure svg {
       display: block;
       width: 100%;
@@ -293,10 +325,52 @@
       list-style: none;
     }
 
+    .theme-aside {
+      min-width: 0;
+    }
+
     .theme-list li {
       padding-left: 14px;
       border-left: 3px solid var(--accent);
       color: var(--ink);
+    }
+
+    .agreement-visual {
+      display: grid;
+      grid-template-columns: minmax(58px, 0.72fr) auto minmax(58px, 0.72fr);
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfd;
+    }
+
+    .agreement-visual img {
+      width: 100%;
+      max-height: 98px;
+      object-fit: contain;
+    }
+
+    .agreement-exchange {
+      display: grid;
+      gap: 8px;
+      justify-items: center;
+    }
+
+    .conversation-bubble {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 28px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--soft);
+      color: var(--accent-strong);
+      font-weight: 850;
+      font-style: italic;
     }
 
     .materials-actions {
@@ -442,6 +516,45 @@
       color: var(--ink);
       font-size: 0.92rem;
       line-height: 1.45;
+    }
+
+    .demo-actors {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin: 0 0 20px;
+    }
+
+    .demo-actor {
+      display: grid;
+      grid-template-columns: 54px minmax(0, 1fr);
+      gap: 12px;
+      align-items: center;
+      min-height: 76px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfd;
+    }
+
+    .demo-actor img {
+      width: 54px;
+      height: 58px;
+      object-fit: contain;
+    }
+
+    .demo-actor strong {
+      display: block;
+      color: var(--text);
+      font-size: 0.95rem;
+    }
+
+    .demo-actor span {
+      display: block;
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.35;
     }
 
     .context-strip,
@@ -914,6 +1027,10 @@
         grid-template-columns: 1fr;
       }
 
+      .demo-actors {
+        grid-template-columns: 1fr;
+      }
+
       .calibration-figure {
         min-height: 0;
       }
@@ -934,6 +1051,19 @@
       .presenters a {
         width: 100%;
         justify-content: center;
+      }
+
+      .calibration-cast {
+        gap: 8px;
+      }
+
+      .cast-weather {
+        padding: 4px 8px;
+      }
+
+      .cast-weather img {
+        width: 24px;
+        height: 24px;
       }
 
       .paper {
@@ -995,6 +1125,14 @@
         </div>
 
         <figure class="calibration-figure" aria-label="Reliability diagram sketch">
+          <div class="calibration-cast" aria-hidden="true">
+            <img class="cast-character" src="assets/characters/learner-pointing.png" width="221" height="420" alt="">
+            <span class="cast-weather">
+              <img src="assets/characters/sun.png" width="420" height="419" alt="">
+              <img src="assets/characters/rain-cloud.png" width="420" height="354" alt="">
+            </span>
+            <img class="cast-character" src="assets/characters/adversary-standing.png" width="273" height="420" alt="">
+          </div>
           <svg viewBox="0 0 360 300" role="img" aria-labelledby="chart-title chart-desc">
             <title id="chart-title">Calibration curve sketch</title>
             <desc id="chart-desc">A reliability diagram with a diagonal reference line and a calibrated curve approaching it.</desc>
@@ -1129,6 +1267,23 @@
             ECE; ECE multicalibration aims to reduce calibration error, with
             low swap regret following as a corollary.
           </p>
+
+          <div class="demo-actors" aria-label="Game roles">
+            <div class="demo-actor">
+              <img src="assets/characters/learner-thinking.png" width="145" height="420" loading="lazy" decoding="async" alt="Forecaster character">
+              <div>
+                <strong>Forecaster</strong>
+                <span>chooses a randomized rain probability</span>
+              </div>
+            </div>
+            <div class="demo-actor">
+              <img src="assets/characters/adversary-clipboard.png" width="289" height="420" loading="lazy" decoding="async" alt="Environment character">
+              <div>
+                <strong>Environment</strong>
+                <span>chooses rain or dry from the history</span>
+              </div>
+            </div>
+          </div>
 
           <div class="control-grid">
             <div class="control-row">
@@ -1311,11 +1466,21 @@
               compete with models using their joint feature space.
             </p>
           </div>
-          <ul class="theme-list">
-            <li>Conversation calibration gives a behavioral route to fast agreement.</li>
-            <li>Conversation multicalibration supports information aggregation.</li>
-            <li>The framework applies to human-AI and multi-agent prediction settings.</li>
-          </ul>
+          <div class="theme-aside">
+            <div class="agreement-visual" aria-label="Two prediction agents exchanging forecasts">
+              <img src="assets/characters/learner-thinking.png" width="145" height="420" loading="lazy" decoding="async" alt="">
+              <span class="agreement-exchange" aria-hidden="true">
+                <span class="conversation-bubble">p</span>
+                <span class="conversation-bubble">q</span>
+              </span>
+              <img src="assets/characters/learner-thumbs-up.png" width="200" height="420" loading="lazy" decoding="async" alt="">
+            </div>
+            <ul class="theme-list">
+              <li>Conversation calibration gives a behavioral route to fast agreement.</li>
+              <li>Conversation multicalibration supports information aggregation.</li>
+              <li>The framework applies to human-AI and multi-agent prediction settings.</li>
+            </ul>
+          </div>
         </div>
       </div>
     </section>
