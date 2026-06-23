@@ -151,6 +151,7 @@
 
     .calibration-figure {
       width: 100%;
+      margin: 0;
       min-height: 280px;
       padding: 24px;
       border: 1px solid var(--line);
@@ -161,6 +162,7 @@
     .calibration-figure svg {
       display: block;
       width: 100%;
+      min-width: 0;
       height: auto;
     }
 
@@ -190,6 +192,118 @@
       margin: 16px 0 0;
       color: var(--muted);
       font-size: 1.05rem;
+    }
+
+    .roadmap-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 34px;
+    }
+
+    .roadmap-item {
+      min-width: 0;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .roadmap-item-wide {
+      grid-column: 1 / -1;
+    }
+
+    .roadmap-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      background: var(--soft);
+      color: var(--accent-strong);
+      font-weight: 850;
+    }
+
+    .roadmap-item h3,
+    .materials-panel h3 {
+      margin: 14px 0 0;
+      color: var(--text);
+      font-size: 1.2rem;
+      line-height: 1.25;
+    }
+
+    .roadmap-item p,
+    .materials-panel p,
+    .theme-panel p {
+      margin: 10px 0 0;
+      color: var(--muted);
+    }
+
+    .roadmap-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .roadmap-links a,
+    .materials-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fbfcfd;
+      color: var(--ink);
+      font-size: 0.88rem;
+      font-weight: 750;
+      text-decoration: none;
+    }
+
+    .roadmap-links a:hover,
+    .materials-link:hover {
+      border-color: var(--accent);
+      background: var(--soft);
+      color: var(--accent-strong);
+    }
+
+    .theme-panel,
+    .materials-panel {
+      margin-top: 30px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .theme-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(260px, 0.72fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .theme-list {
+      display: grid;
+      gap: 10px;
+      margin: 4px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .theme-list li {
+      padding-left: 14px;
+      border-left: 3px solid var(--accent);
+      color: var(--ink);
+    }
+
+    .materials-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
     }
 
     .reading-list {
@@ -795,6 +909,11 @@
         grid-template-columns: 1fr;
       }
 
+      .roadmap-grid,
+      .theme-grid {
+        grid-template-columns: 1fr;
+      }
+
       .calibration-figure {
         min-height: 0;
       }
@@ -850,7 +969,9 @@
     <nav class="nav" aria-label="Main navigation">
       <a class="brand" href="#">Calibration Tutorial</a>
       <div class="nav-links">
+        <a href="#roadmap">Roadmap</a>
         <a href="#demo">Demo</a>
+        <a href="#materials">Materials</a>
         <a href="#reading-list">Reading List</a>
       </div>
     </nav>
@@ -900,12 +1021,94 @@
       </div>
     </section>
 
+    <section id="roadmap" class="content" aria-labelledby="roadmap-title">
+      <p class="section-kicker">Tutorial Roadmap</p>
+      <h2 id="roadmap-title">From empirical probability tests to downstream guarantees</h2>
+      <p class="section-intro">
+        The tutorial follows one thread: identify the empirical properties of
+        probabilities that make them useful, learn forecasts satisfying those
+        properties, and use them for decisions, prediction, and collaboration.
+      </p>
+
+      <div class="roadmap-grid">
+        <article class="roadmap-item">
+          <span class="roadmap-number">1</span>
+          <h3>Why Calibration?</h3>
+          <p>
+            Individual probabilities are hard to verify directly, so we start
+            with auditable empirical tests that real probabilities should pass.
+          </p>
+          <div class="roadmap-links">
+            <a href="#foundations-title">Foundations</a>
+            <a href="#metrics-title">Metrics</a>
+          </div>
+        </article>
+
+        <article class="roadmap-item">
+          <span class="roadmap-number">2</span>
+          <h3>Multicalibration and Outcome Indistinguishability</h3>
+          <p>
+            Calibration becomes much more useful when it holds on rich,
+            overlapping subsequences defined by context, groups, benchmarks,
+            or interaction history.
+          </p>
+          <div class="roadmap-links">
+            <a href="#multicalibration-title">Algorithms</a>
+            <a href="#complexity-title">Complexity</a>
+          </div>
+        </article>
+
+        <article class="roadmap-item">
+          <span class="roadmap-number">3</span>
+          <h3>Efficient Online Algorithms</h3>
+          <p>
+            The minimax and approachability viewpoint turns a large family of
+            calibration-style constraints into online learning algorithms with
+            adversarial guarantees.
+          </p>
+          <div class="roadmap-links">
+            <a href="#demo">Interactive demo</a>
+            <a href="#multicalibration-title">Online multicalibration</a>
+          </div>
+        </article>
+
+        <article class="roadmap-item">
+          <span class="roadmap-number">4</span>
+          <h3>Omniprediction</h3>
+          <p>
+            A single forecast can be post-processed for many downstream losses,
+            so learning good probabilities can be separated from choosing the
+            eventual decision problem.
+          </p>
+          <div class="roadmap-links">
+            <a href="#omniprediction-title">Omniprediction papers</a>
+          </div>
+        </article>
+
+        <article class="roadmap-item roadmap-item-wide">
+          <span class="roadmap-number">5</span>
+          <h3>Agreement and Information Aggregation</h3>
+          <p>
+            Conditional calibration also gives a tractable way to reason about
+            communication between agents with different information, replacing
+            idealized Bayesian common-prior assumptions with enforceable
+            behavioral conditions.
+          </p>
+          <div class="roadmap-links">
+            <a href="#agreement-overview">Overview</a>
+            <a href="#agreement-title">Agreement readings</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
     <section id="demo" class="content demo-section" aria-labelledby="demo-title">
       <p class="section-kicker">Interactive</p>
       <h2 id="demo-title">Rain Forecasting Game</h2>
       <p class="section-intro">
-        A short online game about predicting rain and checking whether simple
-        umbrella users can safely act on the forecasts.
+        A companion to the calibration and multicalibration part of the
+        tutorial: predict rain online, let simple umbrella users act on the
+        forecasts, and watch calibration error and downstream regret evolve.
       </p>
 
       <div class="demo-tool" data-calibration-game>
@@ -1080,6 +1283,63 @@
             </div>
           </details>
         </aside>
+      </div>
+    </section>
+
+    <section id="agreement-overview" class="content" aria-labelledby="agreement-overview-title">
+      <p class="section-kicker">Collaboration</p>
+      <h2 id="agreement-overview-title">Agreement as a calibration problem</h2>
+      <p class="section-intro">
+        The later part of the tutorial uses calibration to study how two agents
+        can exchange predictions, reach agreement quickly, and aggregate
+        complementary information without sharing their raw features.
+      </p>
+
+      <div class="theme-panel">
+        <div class="theme-grid">
+          <div>
+            <p>
+              Classical agreement theorems assume idealized Bayesian agents
+              with common priors. The tutorial replaces that assumption with
+              conversation calibration: each agent's next prediction should be
+              calibrated on subsequences defined by the other agent's previous
+              prediction.
+            </p>
+            <p>
+              Strengthening this to conversation multicalibration connects
+              agreement to accuracy: agents can converge to predictions that
+              compete with models using their joint feature space.
+            </p>
+          </div>
+          <ul class="theme-list">
+            <li>Conversation calibration gives a behavioral route to fast agreement.</li>
+            <li>Conversation multicalibration supports information aggregation.</li>
+            <li>The framework applies to human-AI and multi-agent prediction settings.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="materials" class="content" aria-labelledby="materials-title">
+      <p class="section-kicker">Materials</p>
+      <h2 id="materials-title">Slides and tutorial materials</h2>
+      <p class="section-intro">
+        Slides are being developed and will be posted here when they are ready
+        to share publicly. For now, this page hosts the reading list and the
+        interactive companion demo.
+      </p>
+
+      <div class="materials-panel">
+        <h3>Coming soon</h3>
+        <p>
+          The final tutorial deck will be linked here as a PDF, with the source
+          PowerPoint available if appropriate. The reading list below is already
+          organized to match the current lecture arc.
+        </p>
+        <div class="materials-actions">
+          <a class="materials-link" href="#reading-list">Browse readings</a>
+          <a class="materials-link" href="#demo">Try the demo</a>
+        </div>
       </div>
     </section>
 
