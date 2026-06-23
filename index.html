@@ -162,8 +162,8 @@
     .calibration-cast {
       display: flex;
       align-items: flex-end;
-      justify-content: center;
-      gap: 18px;
+      justify-content: space-between;
+      gap: 12px;
       margin-bottom: 8px;
     }
 
@@ -541,20 +541,6 @@
       width: 54px;
       height: 58px;
       object-fit: contain;
-    }
-
-    .demo-actor-weather {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 3px;
-      width: 54px;
-      height: 58px;
-    }
-
-    .demo-actor-weather img {
-      width: 27px;
-      height: 27px;
     }
 
     .demo-actor strong {
@@ -1145,6 +1131,7 @@
               <img src="assets/characters/sun.png" width="420" height="419" alt="">
               <img src="assets/characters/rain-cloud.png" width="420" height="354" alt="">
             </span>
+            <img class="cast-character" src="assets/characters/adversary-standing.png" width="185" height="420" alt="">
           </div>
           <svg viewBox="0 0 360 300" role="img" aria-labelledby="chart-title chart-desc">
             <title id="chart-title">Calibration curve sketch</title>
@@ -1290,12 +1277,9 @@
               </div>
             </div>
             <div class="demo-actor">
-              <span class="demo-actor-weather" aria-hidden="true">
-                <img src="assets/characters/sun.png" width="420" height="419" loading="lazy" decoding="async" alt="">
-                <img src="assets/characters/rain-cloud.png" width="420" height="354" loading="lazy" decoding="async" alt="">
-              </span>
+              <img src="assets/characters/adversary-standing.png" width="185" height="420" loading="lazy" decoding="async" alt="Adversary character">
               <div>
-                <strong>Environment</strong>
+                <strong>Adversary</strong>
                 <span>chooses rain or dry from the history</span>
               </div>
             </div>
