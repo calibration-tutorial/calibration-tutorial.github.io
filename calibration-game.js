@@ -4,22 +4,22 @@
   const CALIBRATION_GROUPS = [
     {
       id: "coast",
-      label: "Coast days",
+      label: "ICU patients",
       applies: (context) => context.region === "coast"
     },
     {
       id: "inland",
-      label: "Inland days",
+      label: "Ward patients",
       applies: (context) => context.region === "inland"
     },
     {
       id: "morning",
-      label: "Morning rounds",
+      label: "Early-watch patients",
       applies: (context) => context.period === "morning"
     },
     {
       id: "evening",
-      label: "Evening rounds",
+      label: "Late-watch patients",
       applies: (context) => context.period === "evening"
     }
   ];
@@ -52,36 +52,36 @@
   const DECISION_MAKERS = [
     {
       id: "general",
-      label: "Everyday commuter",
-      scope: "All rounds",
+      label: "General clinician",
+      scope: "All patients",
       cost: 0.5,
       applies: () => true
     },
     {
       id: "coast",
-      label: "Coastal walker",
-      scope: "Coast rounds",
+      label: "ICU specialist",
+      scope: "ICU patients",
       cost: 0.35,
       applies: (context) => context.region === "coast"
     },
     {
       id: "inland",
-      label: "Inland minimalist",
-      scope: "Inland rounds",
+      label: "Ward conservative",
+      scope: "Ward patients",
       cost: 0.65,
       applies: (context) => context.region === "inland"
     },
     {
       id: "morning",
-      label: "Morning cyclist",
-      scope: "Morning rounds",
+      label: "Early-response clinician",
+      scope: "Early-watch patients",
       cost: 0.45,
       applies: (context) => context.period === "morning"
     },
     {
       id: "evening",
-      label: "Evening hiker",
-      scope: "Evening rounds",
+      label: "Late-watch clinician",
+      scope: "Late-watch patients",
       cost: 0.55,
       applies: (context) => context.period === "evening"
     }
@@ -89,19 +89,19 @@
 
   const STRATEGIES = {
     "always-zero": {
-      label: "Always dry",
+      label: "No sepsis",
       outcome: () => 0
     },
     "always-one": {
-      label: "Always rain",
+      label: "Always sepsis",
       outcome: () => 1
     },
     "red-blue": {
-      label: "Coast rain",
+      label: "ICU high risk",
       outcome: (_history, context) => context.region === "coast" ? 1 : 0
     },
     "early-late": {
-      label: "Morning rain",
+      label: "Early high risk",
       outcome: (_history, context) => context.period === "morning" ? 1 : 0
     },
     alternating: {
@@ -109,7 +109,7 @@
       outcome: (_history, _context, roundIndex) => roundIndex % 2 === 0 ? 1 : 0
     },
     shift: {
-      label: "Storm at 25",
+      label: "Condition shift",
       outcome: (_history, _context, roundIndex) => roundIndex < 25 ? 0 : 1
     },
     reactive: {
@@ -227,11 +227,11 @@
     }
 
     bestResponse(maker, prediction) {
-      return prediction >= maker.cost ? "bring" : "leave";
+      return prediction >= maker.cost ? "treat" : "monitor";
     }
 
     decisionUtility(maker, action, outcome) {
-      return action === "bring" ? outcome - maker.cost : 0;
+      return action === "treat" ? outcome - maker.cost : 0;
     }
 
     calibrationGroupLabel(groupId) {
@@ -390,7 +390,7 @@
 
       for (const groupId of activeGroupIds) {
         for (const maker of DECISION_MAKERS) {
-          for (const swap of ["bring-to-leave", "leave-to-bring"]) {
+          for (const swap of ["treat-to-monitor", "monitor-to-treat"]) {
             const logit = this.learningRate() * this.getDecisionScore(groupId, maker.id, swap);
             weightedExperts.push({ groupId, maker, swap, logit });
             maxLogit = Math.max(maxLogit, logit);
@@ -418,15 +418,15 @@
 
         for (const groupId of activeGroupIds) {
           for (const maker of DECISION_MAKERS) {
-            const bringWeight = lambdas.get(this.decisionExpertKey(groupId, maker.id, "bring-to-leave")) || 0;
-            const leaveWeight = lambdas.get(this.decisionExpertKey(groupId, maker.id, "leave-to-bring")) || 0;
+            const treatWeight = lambdas.get(this.decisionExpertKey(groupId, maker.id, "treat-to-monitor")) || 0;
+            const monitorWeight = lambdas.get(this.decisionExpertKey(groupId, maker.id, "monitor-to-treat")) || 0;
 
             if (bin.mid >= maker.cost) {
-              c0 += bringWeight * maker.cost;
-              c1 += bringWeight * (maker.cost - 1);
+              c0 += treatWeight * maker.cost;
+              c1 += treatWeight * (maker.cost - 1);
             } else {
-              c0 -= leaveWeight * maker.cost;
-              c1 += leaveWeight * (1 - maker.cost);
+              c0 -= monitorWeight * maker.cost;
+              c1 += monitorWeight * (1 - maker.cost);
             }
           }
         }
@@ -621,28 +621,28 @@
     updateDecisionScores(round, y) {
       for (const groupId of this.testGroupIds(round.context)) {
         for (const maker of DECISION_MAKERS) {
-          let bringMass = 0;
-          let leaveMass = 0;
+          let treatMass = 0;
+          let monitorMass = 0;
 
           for (const entry of round.distribution) {
             if (entry.midpoint >= maker.cost) {
-              bringMass += entry.probability;
+              treatMass += entry.probability;
             } else {
-              leaveMass += entry.probability;
+              monitorMass += entry.probability;
             }
           }
 
           this.setDecisionScore(
             groupId,
             maker.id,
-            "bring-to-leave",
-            this.getDecisionScore(groupId, maker.id, "bring-to-leave") + bringMass * (maker.cost - y)
+            "treat-to-monitor",
+            this.getDecisionScore(groupId, maker.id, "treat-to-monitor") + treatMass * (maker.cost - y)
           );
           this.setDecisionScore(
             groupId,
             maker.id,
-            "leave-to-bring",
-            this.getDecisionScore(groupId, maker.id, "leave-to-bring") + leaveMass * (y - maker.cost)
+            "monitor-to-treat",
+            this.getDecisionScore(groupId, maker.id, "monitor-to-treat") + monitorMass * (y - maker.cost)
           );
         }
       }
@@ -709,7 +709,7 @@
       const groupTotals = new Map();
       const makerStats = new Map();
       const totalRounds = Math.max(1, this.history.length);
-      let umbrellaCount = 0;
+      let treatmentCount = 0;
       let decisionCount = 0;
 
       for (const record of this.history) {
@@ -728,27 +728,27 @@
 
         for (const maker of this.activeDecisionMakers(record.context)) {
           const action = this.bestResponse(maker, record.prediction);
-          const bringUtility = this.decisionUtility(maker, "bring", record.outcome);
+          const treatUtility = this.decisionUtility(maker, "treat", record.outcome);
           const chosenUtility = this.decisionUtility(maker, action, record.outcome);
           const stats = makerStats.get(maker.id) || {
             maker,
             count: 0,
-            brings: 0,
-            bringToLeaveImprovement: 0,
-            leaveToBringImprovement: 0
+            treats: 0,
+            treatToMonitorImprovement: 0,
+            monitorToTreatImprovement: 0
           };
 
           stats.count += 1;
-          stats.brings += action === "bring" ? 1 : 0;
+          stats.treats += action === "treat" ? 1 : 0;
 
-          if (action === "bring") {
-            stats.bringToLeaveImprovement += 0 - chosenUtility;
+          if (action === "treat") {
+            stats.treatToMonitorImprovement += 0 - chosenUtility;
           } else {
-            stats.leaveToBringImprovement += bringUtility - chosenUtility;
+            stats.monitorToTreatImprovement += treatUtility - chosenUtility;
           }
 
           makerStats.set(maker.id, stats);
-          umbrellaCount += action === "bring" ? 1 : 0;
+          treatmentCount += action === "treat" ? 1 : 0;
           decisionCount += 1;
         }
       }
@@ -787,8 +787,8 @@
       for (const stats of makerStats.values()) {
         const denominator = Math.max(1, stats.count);
         const swapRegret = (
-          Math.max(0, stats.bringToLeaveImprovement) +
-          Math.max(0, stats.leaveToBringImprovement)
+          Math.max(0, stats.treatToMonitorImprovement) +
+          Math.max(0, stats.monitorToTreatImprovement)
         ) / denominator;
 
         if (swapRegret > maxSwapRegret) {
@@ -802,7 +802,7 @@
         calibrationError,
         multicalibrationError,
         maxSwapRegret,
-        umbrellaRate: decisionCount ? umbrellaCount / decisionCount : 0,
+        treatmentRate: decisionCount ? treatmentCount / decisionCount : 0,
         worstCell,
         worstCellLabel,
         worstGroup,
@@ -846,8 +846,8 @@
 
   function contextLabel(context) {
     return [
-      context.region === "coast" ? "Coast" : "Inland",
-      context.period === "morning" ? "Morning" : "Evening"
+      context.region === "coast" ? "ICU" : "Ward",
+      context.period === "morning" ? "Early watch" : "Late watch"
     ];
   }
 
@@ -872,7 +872,7 @@
       mcError: root.querySelector("[data-game-mc-error]"),
       worstGroup: root.querySelector("[data-game-worst-group]"),
       swapRegret: root.querySelector("[data-game-swap-regret]"),
-      umbrellaRate: root.querySelector("[data-game-umbrella-rate]"),
+      treatmentRate: root.querySelector("[data-game-treatment-rate]"),
       worstAgent: root.querySelector("[data-game-worst-agent]"),
       decisionCount: root.querySelector("[data-game-decision-count]"),
       treeLabel: root.querySelector("[data-game-tree-label]"),
@@ -960,15 +960,15 @@
       const records = results.map((result) => result.record);
       const first = records[0];
       const lastRecord = records[records.length - 1];
-      const coastCount = records.filter((record) => record.context.region === "coast").length;
-      const morningCount = records.filter((record) => record.context.period === "morning").length;
-      const rainCount = records.filter((record) => record.outcome === 1).length;
+      const icuCount = records.filter((record) => record.context.region === "coast").length;
+      const earlyCount = records.filter((record) => record.context.period === "morning").length;
+      const sepsisCount = records.filter((record) => record.outcome === 1).length;
       const range = first.roundNumber === lastRecord.roundNumber
-        ? `day ${first.roundNumber}`
-        : `days ${first.roundNumber}-${lastRecord.roundNumber}`;
+        ? `patient ${first.roundNumber}`
+        : `patients ${first.roundNumber}-${lastRecord.roundNumber}`;
 
-      return `Last run: ${range}; ${coastCount} coast/${records.length - coastCount} inland, ` +
-        `${morningCount} morning/${records.length - morningCount} evening, ${rainCount} rain.`;
+      return `Last run: ${range}; ${icuCount} ICU/${records.length - icuCount} ward, ` +
+        `${earlyCount} early-watch/${records.length - earlyCount} late-watch, ${sepsisCount} sepsis.`;
     }
 
     function render() {
@@ -986,25 +986,25 @@
         `<span>${periodLabel}</span>`
       ].join("");
       elements.contextNote.textContent = autoMode
-        ? "This is the next simulated day. Batches advance many days; the forecast card summarizes the last run."
-        : "This is the context for the day you are choosing.";
+        ? "This is the next simulated patient. Batches advance many patients; the forecast card summarizes the last run."
+        : "This is the context for the patient you are choosing.";
       elements.calibrationGroups.innerHTML = [
         { label: "All forecasts" },
         ...state.calibrationGroups
       ].map((group) => `<span>${group.label}</span>`).join("");
-      elements.agentNote.textContent = "Each user brings an umbrella when the forecast exceeds their personal cost, and the regret score is computed separately for each user's active days.";
+      elements.agentNote.textContent = "Each clinician treats when the sepsis-risk forecast exceeds their treatment threshold, and regret is computed separately on each clinician's active patients.";
       elements.algorithmNote.textContent = decisionMode
-        ? "Optimizes the umbrella-user regret score directly."
-        : "Optimizes calibration across forecast bins and context groups; umbrella regret is measured afterward.";
+        ? "Optimizes the clinician regret score directly."
+        : "Optimizes calibration across forecast bins and context groups; clinician regret is measured afterward.";
       renderAgents(pending.decisionMakers);
 
       const shownForecast = autoMode ? pending.prediction : last ? last.prediction : null;
       elements.status.textContent = autoMode
-        ? "Auto weather"
+        ? "Auto patients"
         : "Manual: next forecast hidden";
       elements.forecastLabel.textContent = autoMode
-        ? "Forecast for next day"
-        : last ? "Last forecast" : "Rain forecast";
+        ? "Forecast for next patient"
+        : last ? "Last forecast" : "Sepsis-risk forecast";
       elements.forecast.textContent = shownForecast === null
         ? "Hidden"
         : formatProbability(shownForecast);
@@ -1013,21 +1013,21 @@
       elements.mcError.textContent = formatProbability(metrics.multicalibrationError);
       elements.worstGroup.textContent = `Worst group: ${metrics.worstGroup}`;
       elements.swapRegret.textContent = formatProbability(metrics.maxSwapRegret);
-      elements.umbrellaRate.textContent = `${Math.round(metrics.umbrellaRate * 100)}%`;
+      elements.treatmentRate.textContent = `${Math.round(metrics.treatmentRate * 100)}%`;
       elements.worstAgent.textContent = metrics.worstDecisionAgent === "n/a"
         ? metrics.decisionCount
-          ? "No user has positive regret yet"
-          : "No umbrella decisions yet"
-        : `Worst user: ${metrics.worstDecisionAgent}`;
+          ? "No clinician has positive regret yet"
+          : "No treatment decisions yet"
+        : `Worst clinician: ${metrics.worstDecisionAgent}`;
       elements.decisionCount.textContent = `${metrics.decisionCount} decisions`;
       elements.treeLabel.textContent = decisionMode
         ? "Decision threshold partition"
         : "Adaptive prediction tree";
       elements.last.textContent = last
-        ? lastRunSummary || `Day ${last.roundNumber}: forecast ${formatProbability(last.prediction)}, weather ${last.outcome ? "rain" : "dry"}`
+        ? lastRunSummary || `Patient ${last.roundNumber}: forecast ${formatProbability(last.prediction)}, outcome ${last.outcome ? "sepsis" : "no sepsis"}`
         : autoMode
-          ? "Use Next day to step once, or Run 10/50 to simulate a batch."
-          : "Choose Dry or Rain before seeing this day's hidden forecast.";
+          ? "Use Next patient to step once, or Run 10/50 to simulate a batch."
+          : "Choose No sepsis or Sepsis before seeing this patient's hidden forecast.";
 
       elements.outcomes.forEach((button) => {
         button.disabled = autoMode;
@@ -1038,8 +1038,8 @@
       elements.manualControls.hidden = autoMode;
       elements.autoControls.hidden = !autoMode;
       elements.modeNote.textContent = autoMode
-        ? "The selected pattern chooses rain or dry automatically."
-        : "You choose whether it rains before seeing the hidden forecast.";
+        ? "The selected pattern chooses sepsis or no sepsis automatically."
+        : "You choose whether sepsis occurs before seeing the hidden forecast.";
 
       renderDistribution(pending.distribution);
       renderTree(state.bins, decisionMode);
@@ -1058,7 +1058,7 @@
         <div class="agent-row${maker.active ? "" : " is-inactive"}">
           <span class="agent-name">${maker.label}${maker.active ? '<span class="agent-active">active</span>' : ""}</span>
           <span>${maker.scope}</span>
-          <span>bring if p >= ${formatProbability(maker.cost)}</span>
+          <span>treat if p >= ${formatProbability(maker.cost)}</span>
         </div>
       `).join("");
       elements.agents.innerHTML = header + rows;
