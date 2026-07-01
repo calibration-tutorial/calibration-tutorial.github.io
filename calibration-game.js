@@ -3,24 +3,24 @@
 
   const CALIBRATION_GROUPS = [
     {
-      id: "coast",
+      id: "icu",
       label: "ICU patients",
-      applies: (context) => context.region === "coast"
+      applies: (context) => context.care === "icu"
     },
     {
-      id: "inland",
+      id: "ward",
       label: "Ward patients",
-      applies: (context) => context.region === "inland"
+      applies: (context) => context.care === "ward"
     },
     {
-      id: "morning",
-      label: "Early-watch patients",
-      applies: (context) => context.period === "morning"
+      id: "unstable-vitals",
+      label: "Unstable vitals",
+      applies: (context) => context.vitals === "unstable"
     },
     {
-      id: "evening",
-      label: "Late-watch patients",
-      applies: (context) => context.period === "evening"
+      id: "stable-vitals",
+      label: "Stable vitals",
+      applies: (context) => context.vitals === "stable"
     }
   ];
 
@@ -58,32 +58,32 @@
       applies: () => true
     },
     {
-      id: "coast",
+      id: "icu",
       label: "ICU specialist",
       scope: "ICU patients",
       cost: 0.35,
-      applies: (context) => context.region === "coast"
+      applies: (context) => context.care === "icu"
     },
     {
-      id: "inland",
+      id: "ward",
       label: "Ward conservative",
       scope: "Ward patients",
       cost: 0.65,
-      applies: (context) => context.region === "inland"
+      applies: (context) => context.care === "ward"
     },
     {
-      id: "morning",
-      label: "Early-response clinician",
-      scope: "Early-watch patients",
+      id: "unstable-vitals",
+      label: "Vitals-alert clinician",
+      scope: "Unstable vitals",
       cost: 0.45,
-      applies: (context) => context.period === "morning"
+      applies: (context) => context.vitals === "unstable"
     },
     {
-      id: "evening",
-      label: "Late-watch clinician",
-      scope: "Late-watch patients",
+      id: "stable-vitals",
+      label: "Stable-review clinician",
+      scope: "Stable vitals",
       cost: 0.55,
-      applies: (context) => context.period === "evening"
+      applies: (context) => context.vitals === "stable"
     }
   ];
 
@@ -96,13 +96,13 @@
       label: "Always sepsis",
       outcome: () => 1
     },
-    "red-blue": {
+    "care-setting": {
       label: "ICU high risk",
-      outcome: (_history, context) => context.region === "coast" ? 1 : 0
+      outcome: (_history, context) => context.care === "icu" ? 1 : 0
     },
-    "early-late": {
-      label: "Early high risk",
-      outcome: (_history, context) => context.period === "morning" ? 1 : 0
+    "vital-status": {
+      label: "Unstable vitals high risk",
+      outcome: (_history, context) => context.vitals === "unstable" ? 1 : 0
     },
     alternating: {
       label: "Alternating",
@@ -198,8 +198,8 @@
 
     contextAt(roundIndex) {
       return {
-        region: Math.floor(roundIndex / 2) % 2 === 0 ? "coast" : "inland",
-        period: roundIndex % 2 === 0 ? "morning" : "evening"
+        care: Math.floor(roundIndex / 2) % 2 === 0 ? "icu" : "ward",
+        vitals: roundIndex % 2 === 0 ? "unstable" : "stable"
       };
     }
 
@@ -846,8 +846,8 @@
 
   function contextLabel(context) {
     return [
-      context.region === "coast" ? "ICU" : "Ward",
-      context.period === "morning" ? "Early watch" : "Late watch"
+      context.care === "icu" ? "ICU" : "Ward",
+      context.vitals === "unstable" ? "Unstable vitals" : "Stable vitals"
     ];
   }
 
@@ -960,15 +960,15 @@
       const records = results.map((result) => result.record);
       const first = records[0];
       const lastRecord = records[records.length - 1];
-      const icuCount = records.filter((record) => record.context.region === "coast").length;
-      const earlyCount = records.filter((record) => record.context.period === "morning").length;
+      const icuCount = records.filter((record) => record.context.care === "icu").length;
+      const unstableCount = records.filter((record) => record.context.vitals === "unstable").length;
       const sepsisCount = records.filter((record) => record.outcome === 1).length;
       const range = first.roundNumber === lastRecord.roundNumber
         ? `patient ${first.roundNumber}`
         : `patients ${first.roundNumber}-${lastRecord.roundNumber}`;
 
       return `Last run: ${range}; ${icuCount} ICU/${records.length - icuCount} ward, ` +
-        `${earlyCount} early-watch/${records.length - earlyCount} late-watch, ${sepsisCount} sepsis.`;
+        `${unstableCount} unstable vitals/${records.length - unstableCount} stable vitals, ${sepsisCount} sepsis.`;
     }
 
     function render() {
@@ -978,12 +978,12 @@
       const last = state.history[state.history.length - 1];
       const autoMode = elements.behavior.value !== "manual";
       const decisionMode = core.options.objective === "decision";
-      const [regionLabel, periodLabel] = contextLabel(pending.context);
+      const [careLabel, vitalsLabel] = contextLabel(pending.context);
 
       elements.round.textContent = String(pending.roundNumber);
       elements.context.innerHTML = [
-        `<span>${regionLabel}</span>`,
-        `<span>${periodLabel}</span>`
+        `<span>${careLabel}</span>`,
+        `<span>${vitalsLabel}</span>`
       ].join("");
       elements.contextNote.textContent = autoMode
         ? "This is the next simulated patient. Batches advance many patients; the forecast card summarizes the last run."

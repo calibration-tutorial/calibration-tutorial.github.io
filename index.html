@@ -1241,8 +1241,8 @@
                 <option value="manual">Manual</option>
                 <option value="always-zero">No sepsis</option>
                 <option value="always-one">Always sepsis</option>
-                <option value="red-blue" selected>ICU high risk, ward low risk</option>
-                <option value="early-late">Early high risk, late low risk</option>
+                <option value="care-setting" selected>ICU high risk, ward low risk</option>
+                <option value="vital-status">Unstable vitals high risk</option>
                 <option value="alternating">Alternating</option>
                 <option value="shift">Condition shift at round 25</option>
                 <option value="reactive">React to last forecast</option>
@@ -1259,8 +1259,8 @@
                 <li><strong>Manual</strong> Choose sepsis or no sepsis yourself each day.</li>
                 <li><strong>No sepsis</strong> The outcome is no sepsis every day.</li>
                 <li><strong>Always sepsis</strong> The outcome is sepsis every day.</li>
-                <li><strong>ICU high risk, ward low risk</strong> ICU contexts develop sepsis; ward contexts do not.</li>
-                <li><strong>Early high risk, late low risk</strong> Early-watch contexts develop sepsis; late-watch contexts do not.</li>
+                <li><strong>ICU high risk, ward low risk</strong> ICU patients develop sepsis; ward patients do not.</li>
+                <li><strong>Unstable vitals high risk</strong> Patients with unstable vitals develop sepsis; patients with stable vitals do not.</li>
                 <li><strong>Alternating</strong> Outcomes alternate day by day, starting with sepsis.</li>
                 <li><strong>Condition shift at round 25</strong> The first 25 days have no sepsis; later days develop sepsis.</li>
                 <li><strong>React to last forecast</strong> The first day has no sepsis; later days develop sepsis if the previous sampled forecast was below 55%.</li>

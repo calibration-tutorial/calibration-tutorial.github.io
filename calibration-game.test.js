@@ -11,8 +11,8 @@ function seededRng(seed) {
 const strategies = [
   "always-zero",
   "always-one",
-  "red-blue",
-  "early-late",
+  "care-setting",
+  "vital-status",
   "alternating",
   "shift",
   "reactive",
