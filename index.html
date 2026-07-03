@@ -586,6 +586,18 @@
       line-height: 1.45;
     }
 
+    .demo-disclaimer {
+      max-width: 720px;
+      margin: 14px 0 24px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      font-weight: 650;
+    }
+
+    .demo-disclaimer strong {
+      color: var(--accent-strong);
+    }
+
     .demo-actors {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1403,16 +1415,17 @@
 
     <section id="demo" class="content demo-section" aria-labelledby="demo-title">
       <p class="section-kicker">Interactive</p>
-      <h2 id="demo-title">Sepsis Decision Game</h2>
+      <h2 id="demo-title">Stylized Sepsis Decision Game</h2>
       <p class="section-intro">
         A companion to the calibration and multicalibration part of the
         tutorial: predict sepsis risk online, let simple treatment rules act
         on the forecasts, and watch calibration error and downstream regret
         evolve.
       </p>
+      <p class="demo-disclaimer"><strong>Disclaimer:</strong> We are not doctors. Do not use this to predict Sepsis!</p>
 
       <div class="demo-tool" data-calibration-game>
-        <section class="demo-panel demo-panel-main" aria-label="Sepsis decision game">
+        <section class="demo-panel demo-panel-main" aria-label="Stylized sepsis decision game">
           <div class="demo-topline">
             <div>
               <span class="round-label">Round</span>
