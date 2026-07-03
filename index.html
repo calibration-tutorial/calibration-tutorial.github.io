@@ -4,7 +4,16 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Calibration, Decisions, and Collaboration in Learning | ICML 2026</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230f766e'/%3E%3C/svg%3E">
+  <meta name="description" content="ICML 2026 tutorial on calibration, decision calibration, multicalibration, downstream decisions, and collaboration in learning.">
+  <meta property="og:title" content="Calibration, Decisions, and Collaboration in Learning | ICML 2026">
+  <meta property="og:description" content="An ICML 2026 tutorial on making probabilistic predictions trustworthy for downstream decision-making and collaboration.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://calibration-tutorial.github.io/">
+  <meta property="og:image" content="https://calibration-tutorial.github.io/assets/characters/learner-pointing.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Calibration, Decisions, and Collaboration in Learning | ICML 2026">
+  <meta name="twitter:description" content="An ICML 2026 tutorial on calibration, downstream decisions, and collaboration in learning.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23f6f7f9'/%3E%3Cpath d='M12 52H56M12 52V8' stroke='%2318212f' stroke-width='5' stroke-linecap='round'/%3E%3Cpath d='M16 44L56 14' stroke='%23b9811f' stroke-width='4' stroke-linecap='round' opacity='.72'/%3E%3Cpath d='M16 45C25 35 31 37 40 24S51 17 56 12' fill='none' stroke='%230f766e' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E">
   <style>
     :root {
       color-scheme: light;
@@ -124,21 +133,23 @@
 
     .presenters {
       margin: 30px 0 0;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      max-width: 820px;
     }
 
     .presenters a {
-      display: inline-flex;
+      display: grid;
+      grid-template-columns: 50px minmax(0, 1fr);
       align-items: center;
-      min-height: 34px;
-      padding: 6px 12px;
+      gap: 10px;
+      min-height: 70px;
+      padding: 8px;
       border: 1px solid var(--line);
-      border-radius: 999px;
+      border-radius: 8px;
       color: var(--ink);
       background: #fbfcfd;
-      font-weight: 700;
       text-decoration: none;
     }
 
@@ -147,6 +158,81 @@
       border-color: var(--accent);
       color: var(--accent-strong);
       background: var(--soft);
+    }
+
+    .presenter-photo {
+      width: 50px;
+      height: 50px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      object-fit: cover;
+      background: #fff;
+    }
+
+    .presenter-name {
+      display: block;
+      color: var(--text);
+      font-weight: 800;
+      line-height: 1.15;
+    }
+
+    .presenter-affiliation {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 650;
+      line-height: 1.25;
+    }
+
+    .logistics-card {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      max-width: 820px;
+      margin-top: 22px;
+    }
+
+    .logistics-item {
+      min-width: 0;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--soft);
+      color: var(--ink);
+    }
+
+    .logistics-label {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--accent-strong);
+      font-size: 0.76rem;
+      font-weight: 850;
+      text-transform: uppercase;
+    }
+
+    .logistics-item strong {
+      display: block;
+      color: var(--text);
+      line-height: 1.2;
+    }
+
+    .logistics-item span:not(.logistics-label) {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 650;
+    }
+
+    .logistics-link {
+      text-decoration: none;
+    }
+
+    .logistics-link:hover,
+    .logistics-link:focus-visible {
+      border-color: var(--accent);
+      background: #fbfcfd;
     }
 
     .calibration-figure {
@@ -229,6 +315,19 @@
       max-width: 760px;
       margin: 16px 0 0;
       color: var(--muted);
+      font-size: 1.05rem;
+    }
+
+    .abstract-copy {
+      display: grid;
+      gap: 14px;
+      max-width: 920px;
+      margin-top: 22px;
+    }
+
+    .abstract-copy p {
+      margin: 0;
+      color: var(--ink);
       font-size: 1.05rem;
     }
 
@@ -319,6 +418,34 @@
       flex-wrap: wrap;
       gap: 10px;
       margin-top: 16px;
+    }
+
+    .reading-toc {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 22px;
+    }
+
+    .reading-toc a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 4px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fbfcfd;
+      color: var(--ink);
+      font-size: 0.82rem;
+      font-weight: 750;
+      text-decoration: none;
+    }
+
+    .reading-toc a:hover,
+    .reading-toc a:focus-visible {
+      border-color: var(--accent);
+      background: var(--soft);
+      color: var(--accent-strong);
     }
 
     .reading-list {
@@ -932,6 +1059,23 @@
       background: #b64a4a;
     }
 
+    .try-first {
+      margin: 14px 0 0;
+      padding: 12px 14px;
+      border-left: 4px solid var(--accent);
+      border-radius: 8px;
+      background: var(--soft);
+      color: var(--ink);
+      font-weight: 650;
+    }
+
+    .chart-axis-note {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 650;
+    }
+
     .footer {
       border-top: 1px solid var(--line);
       background: var(--panel);
@@ -943,6 +1087,23 @@
       padding: 28px 0;
       color: var(--muted);
       font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .footer a {
+      color: var(--accent-strong);
+      font-weight: 700;
     }
 
     @media (max-width: 820px) {
@@ -967,6 +1128,11 @@
         grid-template-columns: 1fr;
       }
 
+      .presenters,
+      .logistics-card {
+        grid-template-columns: 1fr;
+      }
+
       .demo-actors {
         grid-template-columns: 1fr;
       }
@@ -986,11 +1152,6 @@
 
       .nav-links {
         gap: 12px;
-      }
-
-      .presenters a {
-        width: 100%;
-        justify-content: center;
       }
 
       .calibration-cast {
@@ -1032,8 +1193,9 @@
 <body>
   <header class="page-header">
     <nav class="nav" aria-label="Main navigation">
-      <a class="brand" href="#">Calibration Tutorial</a>
+      <a class="brand" href="#page-title">Calibration Tutorial</a>
       <div class="nav-links">
+        <a href="#abstract">Abstract</a>
         <a href="#roadmap">Roadmap</a>
         <a href="#demo">Demo</a>
         <a href="#materials">Materials</a>
@@ -1054,9 +1216,44 @@
             aggregation.
           </p>
           <div class="presenters" aria-label="Tutorial presenters">
-            <a href="https://www.cis.upenn.edu/~aaroth/">Aaron Roth</a>
-            <a href="https://www.seas.upenn.edu/~ncollina/">Natalie Collina</a>
-            <a href="https://globusharris.github.io/">Ira Globus-Harris</a>
+            <a href="https://www.cis.upenn.edu/~aaroth/">
+              <img class="presenter-photo" src="assets/speakers/aaron-roth.jpg" width="100" height="100" alt="">
+              <span>
+                <span class="presenter-name">Aaron Roth</span>
+                <span class="presenter-affiliation">University of Pennsylvania</span>
+              </span>
+            </a>
+            <a href="https://www.seas.upenn.edu/~ncollina/">
+              <img class="presenter-photo" src="assets/speakers/natalie-collina.png" width="100" height="100" alt="">
+              <span>
+                <span class="presenter-name">Natalie Collina</span>
+                <span class="presenter-affiliation">University of Pennsylvania / MIT</span>
+              </span>
+            </a>
+            <a href="https://globusharris.github.io/">
+              <img class="presenter-photo" src="assets/speakers/ira-globus-harris.jpg" width="100" height="100" alt="">
+              <span>
+                <span class="presenter-name">Ira Globus-Harris</span>
+                <span class="presenter-affiliation">Cornell University</span>
+              </span>
+            </a>
+          </div>
+          <div class="logistics-card" aria-label="Tutorial logistics">
+            <div class="logistics-item">
+              <span class="logistics-label">Date and time</span>
+              <strong>Mon, Jul 6, 2026</strong>
+              <span>1:30 PM-4:00 PM KST</span>
+            </div>
+            <div class="logistics-item">
+              <span class="logistics-label">Location</span>
+              <strong>Auditorium</strong>
+              <span>ICML 2026</span>
+            </div>
+            <a class="logistics-item logistics-link" href="https://icml.cc/virtual/2026/75369">
+              <span class="logistics-label">Conference page</span>
+              <strong>ICML listing</strong>
+              <span>Schedule and live content</span>
+            </a>
           </div>
         </div>
 
@@ -1092,6 +1289,32 @@
             <circle cx="282" cy="66" r="6" fill="#0f766e"/>
           </svg>
         </figure>
+      </div>
+    </section>
+
+    <section id="abstract" class="content" aria-labelledby="abstract-title">
+      <p class="section-kicker">Abstract</p>
+      <h2 id="abstract-title">Probabilities that downstream users can trust</h2>
+      <div class="abstract-copy">
+        <p>
+          In this tutorial we will learn about a powerful framework to make
+          probabilistic predictions in ways that "look like real probabilities"
+          in all of the ways that matter for downstream applications. We'll see
+          how to do this efficiently even in difficult, adversarial environments,
+          and then focus on two concrete applications.
+        </p>
+        <p>
+          First we'll see how to make predictions that are "trustworthy" for
+          downstream decision makers. Many downstream decision makers, each with
+          different objectives and actions, will be able to act optimally as if
+          our predictions are correct, and get strong guarantees about their
+          performance. Next, we'll see how to make predictions that allow for
+          efficient collaboration between two differently informed parties, like
+          an AI and a human user, who can't easily share their observations,
+          while still obtaining the complementary benefits of their individual
+          knowledge. We'll end with a quick survey of many other applications of
+          this technique.
+        </p>
       </div>
     </section>
 
@@ -1195,18 +1418,16 @@
               <span class="round-label">Round</span>
               <span class="round-number" data-game-round>1</span>
             </div>
-            <span class="status-pill" data-game-status>Manual: next forecast hidden</span>
+            <span class="status-pill" data-game-status>Auto patients</span>
           </div>
 
           <p class="demo-story">
             The forecaster predicts whether a patient will develop sepsis.
-            Clinicians use the forecast to decide when to treat. The main
-            score asks how much better the worst clinician could have done by
-            consistently changing when they treat; lower is better. Decision
-            calibration directly targets this regret, not ECE; ECE
-            multicalibration aims to reduce calibration error, with low swap
-            regret following as a corollary.
+            Clinicians use the forecast to decide when to treat. The main score
+            is how much the worst clinician regrets trusting the forecasts;
+            lower is better.
           </p>
+          <p class="try-first"><strong>Try first:</strong> press Run 50, then switch the algorithm goal and compare worst clinician regret with calibration error.</p>
 
           <div class="demo-actors" aria-label="Game roles">
             <div class="demo-actor">
@@ -1342,6 +1563,9 @@
               <div class="metric metric-spaced">
                 <p class="metric-label">Algorithms used</p>
                 <p class="metric-note">
+                  Decision calibration directly targets clinician regret rather
+                  than ECE. ECE multicalibration aims to minimize calibration
+                  error, with low swap regret following as a corollary.
                   ECE multicalibration is adapted from
                   <a href="https://arxiv.org/abs/2605.09273">Huang, Morgenstern, Roth, and Zhang</a>;
                   decision calibration is adapted from
@@ -1370,6 +1594,7 @@
               <div class="chart-wrap">
                 <canvas data-game-chart aria-label="Calibration error over time"></canvas>
               </div>
+              <p class="chart-axis-note">Y-axis: error or regret value. X-axis: patients seen.</p>
               <div class="legend">
                 <span>Multicalibration</span>
                 <span>Calibration</span>
@@ -1413,6 +1638,17 @@
           <a class="materials-link" href="#reading-list">Browse readings</a>
         </div>
       </div>
+
+      <div class="materials-panel">
+        <h3>Recording</h3>
+        <p>
+          A recording link will be added here after ICML posts the tutorial
+          video.
+        </p>
+        <div class="materials-actions">
+          <a class="materials-link" href="https://icml.cc/virtual/2026/75369">ICML tutorial page</a>
+        </div>
+      </div>
     </section>
 
     <section id="reading-list" class="content" aria-labelledby="reading-list-title">
@@ -1423,6 +1659,21 @@
         their main contribution. Public versions, including arXiv and open
         proceedings pages, are linked when available.
       </p>
+      <nav class="reading-toc" aria-label="Reading list topics">
+        <a href="#foundations-title">Foundations</a>
+        <a href="#multiaccuracy-title">Multiaccuracy</a>
+        <a href="#fairness-title">Fairness</a>
+        <a href="#multicalibration-title">Algorithms</a>
+        <a href="#adaptation-title">Distribution Shift</a>
+        <a href="#conformal-title">Conformal Prediction</a>
+        <a href="#omniprediction-title">Omniprediction</a>
+        <a href="#complexity-title">Complexity</a>
+        <a href="#metrics-title">Metrics and Decisions</a>
+        <a href="#agreement-title">Agreement</a>
+        <a href="#reference-class-title">Reference Classes</a>
+        <a href="#applications-title">Applications</a>
+        <a href="#practical-title">Practical Calibration</a>
+      </nav>
 
       <div class="reading-list">
         <section class="topic" aria-labelledby="foundations-title">
@@ -1933,7 +2184,12 @@
 
   <footer class="footer">
     <div class="footer-inner">
-      Calibration Tutorial for ICML 2026.
+      <span>Calibration Tutorial for ICML 2026.</span>
+      <div class="footer-links">
+        <span>Contact: <a href="mailto:aaroth@cis.upenn.edu">aaroth@cis.upenn.edu</a></span>
+        <a href="https://icml.cc/virtual/2026/75369">ICML tutorial page</a>
+        <span>Cite as: Roth, Collina, and Globus-Harris, ICML 2026 Tutorial.</span>
+      </div>
     </div>
   </footer>
   <script src="calibration-game.js?v=20260528-convergence"></script>
