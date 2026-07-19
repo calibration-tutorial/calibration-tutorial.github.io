@@ -103,10 +103,22 @@
       width: min(1120px, calc(100% - 32px));
       margin: 0 auto;
       display: grid;
-      grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
-      gap: 48px;
-      align-items: center;
+      grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
+      gap: 32px 44px;
+      align-items: start;
       padding: 64px 0 72px;
+    }
+
+    .hero-copy,
+    .hero-details {
+      grid-column: 1;
+    }
+
+    .hero-recording {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+      align-self: center;
+      width: 100%;
     }
 
     .eyebrow {
@@ -1146,8 +1158,15 @@
 
       .hero-inner {
         grid-template-columns: 1fr;
-        gap: 34px;
+        gap: 28px;
         padding: 46px 0 54px;
+      }
+
+      .hero-copy,
+      .hero-recording,
+      .hero-details {
+        grid-column: 1;
+        grid-row: auto;
       }
 
       .demo-tool {
@@ -1237,7 +1256,7 @@
   <main>
     <section class="hero" aria-labelledby="page-title">
       <div class="hero-inner">
-        <div>
+        <div class="hero-copy">
           <p class="eyebrow">ICML 2026 Tutorial</p>
           <h1 id="page-title">Calibration, Decisions, and Collaboration in Learning</h1>
           <p class="lead">
@@ -1245,6 +1264,20 @@
             related ideas in learning, downstream decision-making, and information
             aggregation.
           </p>
+        </div>
+
+        <div class="recording-embed hero-recording">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/Hl-Ygr1CNGI"
+            title="Calibration, Decisions, and Collaboration in Learning - ICML 2026 tutorial recording"
+            loading="eager"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+          ></iframe>
+        </div>
+
+        <div class="hero-details">
           <div class="presenters" aria-label="Tutorial presenters">
             <a href="https://www.cis.upenn.edu/~aaroth/">
               <img class="presenter-photo" src="assets/speakers/aaron-roth.jpg" width="100" height="100" alt="">
@@ -1286,39 +1319,6 @@
             </a>
           </div>
         </div>
-
-        <figure class="calibration-figure" aria-label="Reliability diagram sketch">
-          <div class="calibration-cast" aria-hidden="true">
-            <img class="cast-character" src="assets/characters/learner-pointing.png" width="221" height="420" alt="">
-            <span class="cast-signal">
-              <span>Sepsis risk</span>
-              <strong>0.20</strong>
-            </span>
-            <img class="cast-character" src="assets/characters/adversary-standing.png" width="185" height="420" alt="">
-          </div>
-          <svg viewBox="0 0 360 300" role="img" aria-labelledby="chart-title chart-desc">
-            <title id="chart-title">Calibration curve sketch</title>
-            <desc id="chart-desc">A reliability diagram with a diagonal reference line and a calibrated curve approaching it.</desc>
-            <rect x="42" y="28" width="270" height="220" rx="4" fill="#ffffff" stroke="#d7dde6"/>
-            <line x1="72" y1="220" x2="282" y2="58" stroke="#b9811f" stroke-width="4" stroke-linecap="round"/>
-            <path d="M72 211 C110 178, 130 190, 164 147 S226 105, 282 66" fill="none" stroke="#0f766e" stroke-width="5" stroke-linecap="round"/>
-            <g stroke="#d7dde6" stroke-width="1">
-              <line x1="72" y1="220" x2="282" y2="220"/>
-              <line x1="72" y1="166" x2="282" y2="166"/>
-              <line x1="72" y1="112" x2="282" y2="112"/>
-              <line x1="72" y1="58" x2="282" y2="58"/>
-              <line x1="72" y1="58" x2="72" y2="220"/>
-              <line x1="142" y1="58" x2="142" y2="220"/>
-              <line x1="212" y1="58" x2="212" y2="220"/>
-              <line x1="282" y1="58" x2="282" y2="220"/>
-            </g>
-            <line x1="72" y1="220" x2="282" y2="220" stroke="#263241" stroke-width="2"/>
-            <line x1="72" y1="220" x2="72" y2="58" stroke="#263241" stroke-width="2"/>
-            <text x="177" y="270" text-anchor="middle" fill="#596676" font-size="14">Predicted probability</text>
-            <text x="18" y="142" text-anchor="middle" fill="#596676" font-size="14" transform="rotate(-90 18 142)">Empirical frequency</text>
-            <circle cx="282" cy="66" r="6" fill="#0f766e"/>
-          </svg>
-        </figure>
       </div>
     </section>
 
@@ -1675,16 +1675,6 @@
         <p>
           Watch the full recording of the ICML 2026 tutorial.
         </p>
-        <div class="recording-embed">
-          <iframe
-            src="https://www.youtube-nocookie.com/embed/Hl-Ygr1CNGI"
-            title="Calibration, Decisions, and Collaboration in Learning - ICML 2026 tutorial recording"
-            loading="lazy"
-            referrerpolicy="strict-origin-when-cross-origin"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowfullscreen
-          ></iframe>
-        </div>
         <div class="materials-actions">
           <a class="materials-link" href="https://youtu.be/Hl-Ygr1CNGI">Watch on YouTube</a>
           <a class="materials-link" href="https://icml.cc/virtual/2026/75369">ICML tutorial page</a>
